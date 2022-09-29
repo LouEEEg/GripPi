@@ -1,3 +1,5 @@
+
+#led ligthing code using raspbarry pi
 from gpiozero import LED
 from time import sleep
 from guizero import App, Text, PushButton
