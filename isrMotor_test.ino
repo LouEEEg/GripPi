@@ -15,7 +15,7 @@
 static long base_motor_position = 0;
 
 // Interrupt Logic variables
-static bool base_limit_reached = false;
+// static bool base_limit_reached = false;
 
 // AccelStepper Object Instantiation
 AccelStepper BaseStepper(DRIVER_INTERFACE, BASE_PUL, BASE_DIR);
@@ -24,35 +24,40 @@ AccelStepper BaseStepper(DRIVER_INTERFACE, BASE_PUL, BASE_DIR);
 void setup(){
   Serial.begin(9600);
   driverInit();
-  attachInterrupt(digitalPinToInterrupt(BASE_LIMIT),isrBaseLimit, LOW); 
+  // attachInterrupt(digitalPinToInterrupt(BASE_LIMIT),isrBaseLimit, LOW); 
+  homeBaseAxis();
 }
 
 // ----- MAIN -----
 void loop(){ 
-  homeBaseAxis();
   Serial.print(base_motor_position);
 }
 
 // ----- Home Axis Algorithm
 void homeBaseAxis(void){  
   bool base_home_set = false;
+  int base_limit_reached = 0;
+
   BaseStepper.enableOutputs();
 
   while(!base_home_set){
 
-    while(!base_limit_reached){
-      BaseStepper.move(-1);    
-    } 
-
     while(base_limit_reached){
-      BaseStepper.move(1);
+      BaseStepper.move(-1);
+      base_limit_reached = digitalRead(BASE_LIMIT);    
     } 
 
+    while(!base_limit_reached){
+      BaseStepper.move(1);
+      base_limit_reached = digitalRead(BASE_LIMIT);
+    } 
+
+    BaseStepper.disableOutputs();
     base_home_set = true;
     BaseStepper.setCurrentPosition(base_motor_position);
   }
 
-  BaseStepper.disableOutputs();
+  
 }
 
 // ----- AccelStepper Drivier Init -----
