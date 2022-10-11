@@ -12,8 +12,10 @@
 #define BASE_DIR 7
 
 // Global Variables
-volatile static float base_motor_speed = 500;
-static float base_motor_position = 0;
+static long base_motor_position = 0;
+
+// Interrupt Logic variables
+static bool base_limit_reached = false;
 
 // AccelStepper Object Instantiation
 AccelStepper BaseStepper(DRIVER_INTERFACE, BASE_PUL, BASE_DIR);
@@ -27,9 +29,30 @@ void setup(){
 
 // ----- MAIN -----
 void loop(){ 
-  BaseStepper.enableOutputs(); 
-  BaseStepper.setSpeed(base_motor_speed);
-  BaseStepper.runSpeed(); 
+  homeBaseAxis();
+  Serial.print(base_motor_position);
+}
+
+// ----- Home Axis Algorithm
+void homeBaseAxis(void){  
+  bool base_home_set = false;
+  BaseStepper.enableOutputs();
+
+  while(!base_home_set){
+
+    while(!base_limit_reached){
+      BaseStepper.move(-1);    
+    } 
+
+    while(base_limit_reached){
+      BaseStepper.move(1);
+    } 
+
+    base_home_set = true;
+    BaseStepper.setCurrentPosition(base_motor_position);
+  }
+
+  BaseStepper.disableOutputs();
 }
 
 // ----- AccelStepper Drivier Init -----
@@ -46,6 +69,5 @@ void driverInit(void){
 
 // ----- ISR's -----
 void isrBaseLimit(void){
-  BaseStepper.disableOutputs(); 
-  base_motor_speed = -base_motor_speed;
+  base_limit_reached = true;
 }
