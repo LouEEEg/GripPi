@@ -4,10 +4,10 @@ from guizero import App, Text, PushButton, Picture
 import sys
 
 #Designating LEDs
-led1 = LED(4)
-led2 = LED(3)
-led3 = LED(17)
-led4 = LED(18)
+led1 = LED(3)
+led2 = LED(4)
+led3 = LED(18)
+led4 = LED(17)
 led5 = LED(27)
 led6 = LED(22)
 
