@@ -1,0 +1,82 @@
+from gpiozero import LED
+from time import sleep
+from guizero import App, Text, PushButton, Picture
+import sys
+
+#Designating LEDs
+led1 = LED(3)
+led2 = LED(4)
+led3 = LED(18)
+led4 = LED(17)
+led5 = LED(27)
+led6 = LED(22)
+
+#Designating commands
+def toggleLED1():
+    led1.toggle()
+    if led1.is_lit:
+       button1.image="retrieve.png"
+    else :
+       button1.image="retrieve.png"
+
+def toggleLED2():
+    led2.toggle()
+    if led2.is_lit:
+       button2.image="retrieve.png"
+    else:
+       button2.image="retrieve.png"
+
+def toggleLED3():
+    led3.toggle()
+    if led3.is_lit:
+       button3.image="retrieve.png"
+    else:
+       button3.image="retrieve.png"
+       
+def toggleLED4():
+    led4.toggle()
+    if led4.is_lit:
+       button4.image="store.png"
+    else:
+       button4.image="store.png"
+       
+def toggleLED5():
+    led5.toggle()
+    if led5.is_lit:
+       button5.image="store.png"
+    else:
+       button5.image="store.png"
+       
+def toggleLED6():
+    led6.toggle()
+    if led6.is_lit:
+       button6.image="store.png"
+    else:
+       button6.image="store.png"
+
+def close_gui():
+  sys.exit()
+
+#Designating GUI color and layout
+app = App(title="GripPi Menu", layout="grid", height=1000, width=1000)
+app.bg=(0,102, 204)
+
+#Designating buttons for commands
+Text(app, "RETRIEVE", grid=[3,0])
+button1 = PushButton(app, command=toggleLED1, image="retrieve.png", grid=[0,3])
+Text(app, "1", grid=[0,4])
+button2 = PushButton(app, command=toggleLED2, image="retrieve.png", grid=[3,3])
+Text(app, "2", grid=[3,4])
+button3 = PushButton(app, command=toggleLED3, image="retrieve.png", grid=[6,3])
+Text(app, "3", grid=[6,4])
+Text(app, "STORE", grid=[3,6])
+button4 = PushButton(app, command=toggleLED4, image="store.png", grid=[0,7])
+Text(app, "1", grid=[0,8])
+button5 = PushButton(app, command=toggleLED5, image="store.png", grid=[3,7])
+Text(app, "2", grid=[3,8])
+button6 = PushButton(app, command=toggleLED6, image="store.png", grid=[6,7])
+Text(app, "3", grid=[6,8])
+Text(app, "POWER", grid=[3,9])
+button7 = PushButton(app, command=close_gui, image="power.png", grid=[3,10])
+
+app.display()
