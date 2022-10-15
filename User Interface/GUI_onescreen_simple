@@ -14,10 +14,14 @@ preview_config = picam2.create_preview_configuration(main={"size": (225, 225)})
 picam2.configure(preview_config)
 
 picam2.start()
-time.sleep(2)
 
+time.sleep(2)
 picam2.capture_file("bin1.png")
+
+time.sleep(2)
 picam2.capture_file("bin2.png")
+
+time.sleep(2)
 picam2.capture_file("bin3.png")
 
 #Designating LEDs
