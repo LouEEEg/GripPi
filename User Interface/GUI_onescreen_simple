@@ -2,6 +2,23 @@ from gpiozero import LED
 from time import sleep
 from guizero import App, Text, PushButton, Picture
 import sys
+from picamera2 import Picamera2, Preview
+import time
+
+#Designating camera capture and setup
+picam2 = Picamera2()
+
+picam2.start_preview(Preview.QTGL)
+
+preview_config = picam2.create_preview_configuration(main={"size": (225, 225)})
+picam2.configure(preview_config)
+
+picam2.start()
+time.sleep(2)
+
+picam2.capture_file("bin1.png")
+picam2.capture_file("bin2.png")
+picam2.capture_file("bin3.png")
 
 #Designating LEDs
 led1 = LED(3)
@@ -19,33 +36,39 @@ led6.on()
 def toggle1():
     led1.toggle()
     if led1.is_lit:
-       button1.image="store.png"
+       picam2.capture_file("bin1retrieved.png")
+       button1.image="bin1retrieved.png"
        Text(app, "RETRIEVED", grid=[0,5])
        led4.off()
     else:
-       button1.image="retrieve.png"
+       picam2.capture_file("bin1stored.png")
+       button1.image="bin1stored.png"
        Text(app, "STORED", grid=[0,5],height=10, width=10)
        led4.on()
 
 def toggle2():
     led2.toggle()
     if led2.is_lit:
-       button2.image="store.png"
+       picam2.capture_file("bin2retrieved.png")
+       button2.image="bin2retrieved.png"
        Text(app, "RETRIEVED", grid=[3,5])
        led5.off()
     else:
-       button2.image="retrieve.png"
+       picam2.capture_file("bin2stored.png")
+       button2.image="bin2stored.png"
        Text(app, "STORED", grid=[3,5], height=10, width=10)
        led5.on()
 
 def toggle3():
     led3.toggle()
     if led3.is_lit:
-       button3.image="store.png"
+       picam2.capture_file("bin3retrieved.png")
+       button3.image="bin3retrieved.png"
        Text(app, "RETRIEVED", grid=[6,5])
        led6.off()
     else:
-       button3.image="retrieve.png"
+       picam2.capture_file("bin3stored.png")
+       button3.image="bin3stored.png"
        Text(app, "STORED", grid=[6,5], height=10, width=10)
        led6.on()
 
@@ -53,7 +76,7 @@ def close_gui():
   sys.exit()
 
 #Designating GUI color and layout
-app = App(title="GripPi Menu", layout="grid", height=1000, width=1000)
+app = App(title="GripPi Menu", layout="grid", height=1920, width=1080)
 app.bg=(0,102, 204)
 
 #Designating buttons for commands
@@ -64,9 +87,9 @@ Text(app, "3", grid=[6,3])
 Text(app, "STORED", grid=[0,5], height=10, width=10)
 Text(app, "STORED", grid=[3,5], height=10, width=10)
 Text(app, "STORED", grid=[6,5], height=10, width=10)
-button1 = PushButton(app, command=toggle1, image="retrieve.png", grid=[0,4])
-button2 = PushButton(app, command=toggle2, image="retrieve.png", grid=[3,4])
-button3 = PushButton(app, command=toggle3, image="retrieve.png", grid=[6,4])
+button1 = PushButton(app, command=toggle1, image="bin1.png", grid=[0,4])
+button2 = PushButton(app, command=toggle2, image="bin2.png", grid=[3,4])
+button3 = PushButton(app, command=toggle3, image="bin3.png", grid=[6,4])
 Text(app, "POWER", grid=[3,9])
 button4 = PushButton(app, command=close_gui, image="power.png", grid=[3,10])
 
