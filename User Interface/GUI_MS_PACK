@@ -1,0 +1,101 @@
+from tkinter import*
+from gpiozero import LED
+from smbus2 import SMBus, i2c_msg
+import time
+import sys
+
+root=Tk()
+root.title("GripPi")
+root.minsize(height=500,width=900)
+root["bg"]="#0066CC"
+#root.configure(bg="blue")
+ipadding = {"ipadx": 10, "ipady": 10}
+
+#Designating LEDs
+led1 = LED(15)
+led2 = LED(4)
+led3 = LED(18)
+led4 = LED(17)
+led5 = LED(27)
+led6 = LED(22)
+
+led1.off()
+led2.off()
+led3.off()
+led4.on()
+led5.on()
+led6.on()
+
+def calibrate():
+    led1.toggle()
+    led2.toggle()
+    led3.toggle()
+    led4.toggle()
+    led5.toggle()
+    led6.toggle()
+    
+def toggle1():
+    led1.toggle()
+    if led1.is_lit:
+       led4.off()
+    else :
+       led4.on()
+
+def toggle2():
+    led2.toggle()
+    if led2.is_lit:
+       led5.off()
+    else:
+       led5.on()
+
+def toggle3():
+    led3.toggle()
+    if led3.is_lit:
+       led6.off()
+    else:
+       led6.on()
+
+def close_gui():
+  sys.exit()
+
+def tab1():
+    def tab2():
+        label11.destroy()
+        label12.destroy()
+        button11.destroy()
+        #button12.destroy()
+        button13.destroy()
+        label21=Label(root,text="BINS",font=("Times_New_Roman",25))
+        label21.pack(side=TOP)
+        
+        def back():
+            label21.destroy()
+            button21.destroy()
+            button22.destroy()
+            button23.destroy()
+            button24.destroy()
+            tab1()
+            
+        button21=Button(root,text="BACK",font=("Times_New_Roman",25),command=back,activebackground="red")
+        button21.pack(side=BOTTOM)
+        button22=Button(root,text="1",font=("Times_New_Roman",25),command=toggle1,activebackground="red")
+        button22.pack(**ipadding, expand=True, fill=BOTH, side=LEFT)
+        button23=Button(root,text="2",font=("Times_New_Roman",25),command=toggle2,activebackground="red")
+        button23.pack(**ipadding, expand=True, fill=BOTH, side=LEFT)
+        button24=Button(root,text="3",font=("Times_New_Roman",25),command=toggle3,activebackground="red")
+        button24.pack(**ipadding, expand=True, fill=BOTH, side=LEFT)
+        
+    label11=Label(root,text="HOME",font=("Times_New_Roman",25))
+    label11.pack()
+    label12=Label(root,text="Please clear the workspace before calibrating!",font=("Times_New_Roman",12))
+    label12.pack()
+    button11=Button(root,text="POWER",font=("Times_New_Roman",25),command=close_gui,activebackground="red")
+    button11.pack(side=BOTTOM)
+    #button12=Button(root,text="NEXT",font=("Times_New_Roman",25),command=tab2,activebackground="red")
+    #button12.pack(side=RIGHT)
+    button13=Button(root,text="CALIBRATE",font=("Times_New_Roman",25),command=tab2,activebackground="red")
+    button13.pack(**ipadding)
+    
+tab1()
+
+root.mainloop()
