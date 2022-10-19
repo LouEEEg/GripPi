@@ -67,9 +67,18 @@ def tab1():
         button13.destroy()
         label21=Label(root,text="BINS",font=("Times_New_Roman",25))
         label21.pack(side=TOP)
+        label22=Label(root,text="1",font=("Times_New_Roman",12))
+        label22.pack(expand=True)
+        label23=Label(root,text="2",font=("Times_New_Roman",12))
+        label23.pack(expand=True)
+        label24=Label(root,text="3",font=("Times_New_Roman",12))
+        label24.pack(expand=True)
         
         def back():
             label21.destroy()
+            label22.destroy()
+            label23.destroy()
+            label24.destroy()
             button21.destroy()
             button22.destroy()
             button23.destroy()
@@ -83,7 +92,7 @@ def tab1():
         button23=Button(root,text="2",font=("Times_New_Roman",25),command=toggle2,activebackground="red")
         button23.pack(**ipadding, expand=True, fill=BOTH, side=LEFT)
         button24=Button(root,text="3",font=("Times_New_Roman",25),command=toggle3,activebackground="red")
-        button24.pack(**ipadding, expand=True, fill=BOTH, side=LEFT)
+        button24.pack(**ipadding, expand=True, fill=BOTH,side=LEFT)
         
     label11=Label(root,text="HOME",font=("Times_New_Roman",25))
     label11.pack()
