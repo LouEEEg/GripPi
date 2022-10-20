@@ -1,0 +1,11 @@
+import smbus
+
+DEVICE_BUS = 1
+DEVICE_ADDR = 0X15
+bus = smbus.SMBus(DEVICE_BUS)
+#bus.write_byte_data(DEVICE_ADDR, 0X00, 0X40)
+
+data = [0,46,91,136,181,255]
+
+for x in data:
+    bus.write_byte_data(DEVICE_ADDR, 0X00, x)
