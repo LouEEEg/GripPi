@@ -10,8 +10,7 @@ root=Tk()
 root.title("GripPi")
 root.minsize(height=500,width=900)
 root["bg"]="#0066CC"
-#root.configure(bg="blue")
-ipadding = {"ipadx": 10, "ipady": 10}
+#ipadding = {"ipadx": 10, "ipady": 10}
 
 #DEVICE_BUS = 1
 #DEVICE_ADDR = 0X15
@@ -57,18 +56,6 @@ photo10 = PhotoImage(file = "bin1.png")
 photo20 = PhotoImage(file = "bin2.png")
 
 photo30 = PhotoImage(file = "bin3.png")
-
-#photo11 = PhotoImage(file = "bin1retrieved.png")
-
-#photo21 = PhotoImage(file = "bin2retrieved.png")
-
-#photo31 = PhotoImage(file = "bin3retrieved.png")
-
-#photo12 = PhotoImage(file = "bin1stored.png")
-
-#photo22 = PhotoImage(file = "bin2stored.png")
-
-#photo32 = PhotoImage(file = "bin3stored.png")
 
 def calibrate():
     led1.toggle()
@@ -143,40 +130,53 @@ def tab1():
         button24.pack(side=LEFT)
         
         def update1():
+            
             if button22:
                 picam2.capture_file("bin1retrieved.png")
                 photo11 = PhotoImage(file = "bin1retrieved.png")
                 button22.configure(image=photo11)
-                button22.display()
+                #button22.display
+                #button23.display
+                #button24.display
             else :
                 picam2.capture_file("bin1stored.png")
                 photo12 = PhotoImage(file = "bin1stored.png")
                 button22.configure(image=photo12)
-                button22.display()
+                #button22.display
+                #button23.display
+                #button24.display
                 
         def update2():
             if button23:
                 picam2.capture_file("bin2retrieved.png")
                 photo21 = PhotoImage(file = "bin2retrieved.png")
                 button23.configure(image=photo21)
-                button23.display()
+                #button22.display
+                #button23.display
+                #button24.display
             else :
                 picam2.capture_file("bin2stored.png")
                 photo22 = PhotoImage(file = "bin2stored.png")
                 button23.configure(image=photo22)
-                button23.display()
+                #button22.display
+                #button23.display
+                #button24.display
                 
         def update3():
             if button24:
                 picam2.capture_file("bin3retrieved.png")
                 photo31 = PhotoImage(file = "bin3retrieved.png")
                 button24.configure(image=photo31)
-                button24.display()
+                #button22.display
+                #button23.display
+                #button24.display
             else :
-                picam2.capture_file("bin1stored.png")
-                photo32 = PhotoImage(file = "bin1stored.png")
+                picam2.capture_file("bin3stored.png")
+                photo32 = PhotoImage(file = "bin3stored.png")
                 button24.configure(image=photo32)
-                button24.display()
+                #button22.display
+                #button23.display
+                #button24.display
 
 
     label11=Label(root,text="HOME",font=("Times_New_Roman",25))
