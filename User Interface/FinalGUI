@@ -1,39 +1,46 @@
 from tkinter import*
+from configparser import ConfigParser
 #from smbus2 import SMBus, i2c_msg
 import time
 import sys
-from picamera2 import Picamera2, Preview
+#from picamera2 import Picamera2, Preview
 
 root=Tk()
 root.title("GripPi")
 root.minsize(height=500,width=900)
 root["bg"]="#0066CC"
 
+config = ConfigParser()
+config.read('config.ini')
 
 #Pi camera instance
-picam2 = Picamera2()
+#picam2 = Picamera2()
+#preview_config = picam2.create_preview_configuration(main={"size": (640, 640)})
+#picam2.configure(preview_config)
+#picam2.start()
 
+empty_bin_image = PhotoImage(file = "EmptyBin.png")
+
+bin1_image = PhotoImage(file = config.get('image', 'bin1_image'))
 
 photo1 = PhotoImage(file = "bin1.png")
-photo1F = PhotoImage(file = "bin1F.png")
-items1 = [photo1, photo1F]
+#items1 = [photo1, empty_bin_image]
 
 photo2 = PhotoImage(file = "bin2.png")
-photo2F = PhotoImage(file = "bin2F.png")
-items2 = [photo2, photo2F]
+items2 = [photo2, empty_bin_image]
 
 photo3 = PhotoImage(file = "bin3.png")
-photo3F = PhotoImage(file = "bin3F.png")
-items3 = [photo3, photo3F]
+items3 = [photo3, empty_bin_image]
 
 class gripPiBin:
     def __init__(self, isEmpty, image):
         self.isEmpty = isEmpty
         self.image = image
+            
 
-bin1 = gripPiBin(True, items1)
-bin2 = gripPiBin(True, items2)
-bin3 = gripPiBin(True, items3)
+bin1 = gripPiBin(config.getboolean('main', 'bin1_isEmpty'), photo1)
+bin2 = gripPiBin(False, items2)
+bin3 = gripPiBin(False, items3)
 
 def close_gui():
   sys.exit()
@@ -67,10 +74,11 @@ def tab1():
             
             tab1()
             
+            
         backButton = Button(root,text="BACK",font=("Times_New_Roman",25),command=back,activebackground="red")
         backButton.pack(side=BOTTOM)
         
-        itemButtonLeft = Button(root,image=photo1,command=lambda: [updateItemButtonLeft()],activebackground="red")
+        itemButtonLeft = Button(root,image=bin1_image,command=lambda: [updateItemButtonLeft()],activebackground="red")
         itemButtonLeft.pack(side=LEFT)
         
         itemButtonCenter = Button(root,image=photo2,command=lambda: [updateItemButtonCenter()],activebackground="red")
@@ -83,13 +91,20 @@ def tab1():
             if itemButtonLeft:
                 
                 if bin1.isEmpty :
-                    itemButtonLeft.configure(image=items1[0])
+                    itemButtonLeft.configure(image=photo1)
+                    config.set('main', 'bin1_isEmpty', 'False')
+                    config.set('image', 'bin1_image', 'bin1.png')
                     bin1.isEmpty = False
                     
                 elif not bin1.isEmpty :
-                    itemButtonLeft.configure(image=items1[1])
+                    itemButtonLeft.configure(image=empty_bin_image)
+                    config.set('main', 'bin1_isEmpty', 'True')
+                    config.set('image', 'bin1_image', 'EmptyBin.png')
                     bin1.isEmpty = True
-                    
+                
+                with open('config.ini', 'w') as f:
+                    config.write(f)
+                
         def updateItemButtonCenter():
             if itemButtonCenter:
                 
@@ -98,7 +113,7 @@ def tab1():
                     bin2.isEmpty = False
                     
                 elif not bin2.isEmpty :
-                    itemButtonCenter.configure(image=items2[1])
+                    itemButtonCenter.configure(image=empty_bin_image)
                     bin2.isEmpty = True
 
         def updateItemButtonRight():
@@ -109,9 +124,8 @@ def tab1():
                     bin3.isEmpty = False
                     
                 elif not bin3.isEmpty :
-                    itemButtonRight.configure(image=items3[1])
+                    itemButtonRight.configure(image=empty_bin_image)
                     bin3.isEmpty = True
-
 
 
     homeLabel=Label(root,text="HOME",font=("Times_New_Roman",25))
