@@ -5,10 +5,13 @@ from configparser import ConfigParser
 import sys
 #from picamera2 import Picamera2, Preview
 
+
+RESOLUTION = "1920x1080"
+
 root=Tk()
 root.title("GripPi")
-root.minsize(height=500,width=900)
-root["bg"]="#0066CC"
+root.geometry(RESOLUTION)
+root["bg"]="#0006FC"
 
 config = ConfigParser()
 config.read('config.ini')
@@ -22,13 +25,14 @@ config.read('config.ini')
 photo1 = PhotoImage(file = "bin1.png")
 photo2 = PhotoImage(file = "bin2.png")
 photo3 = PhotoImage(file = "bin3.png")
-
+background_image = PhotoImage(file = "GripPi.png")
 empty_bin_image = PhotoImage(file = "EmptyBin.png")
 
 class gripPiBin:
     def __init__(self, isEmpty, image):
         self.isEmpty = isEmpty
         self.image = image
+    
 
 bin1_image = PhotoImage(file = config.get('image', 'bin1_image'))
 bin2_image = PhotoImage(file = config.get('image', 'bin2_image'))
@@ -44,27 +48,22 @@ def close_gui():
 
 def tab1():
     
+    
+    # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
+    # --- --- --- --- --- --- --- Item Selection Screen - --- --- --- --- --- --- --- 
+    # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     def tab2():
         homeLabel.destroy()
         clearWorkspaceLabel.destroy()
         powerButton.destroy()
         calibrateButton.destroy()
+        motionControlButton.destroy()
         #Top of page 2
-        label21=Label(root,text="BINS",font=("Times_New_Roman",25))
+        label21=Label(root, text="Select an Item", font=("Times_New_Roman",25), anchor="e", justify=CENTER)
         label21.pack(side=TOP)
-        label22=Label(root,text="1",font=("Times_New_Roman",25),background="#0066CC")
-        label22.place(relx=.15,rely=.1)
-        label23=Label(root,text="2",font=("Times_New_Roman",25),background="#0066CC")
-        label23.place(relx=.50,rely=.1)
-        label24=Label(root,text="3",font=("Times_New_Roman",25),background="#0066CC")
-        label24.place(relx=.85,rely=.1)
-        #time.sleep(5)
         
         def back():
             label21.destroy()
-            label22.destroy()
-            label23.destroy()
-            label24.destroy()
             backButton.destroy()
             itemButtonLeft.destroy()
             itemButtonCenter.destroy()
@@ -74,13 +73,13 @@ def tab1():
         backButton = Button(root,text="BACK",font=("Times_New_Roman",25),command=back,activebackground="red")
         backButton.pack(side=BOTTOM)
         
-        itemButtonLeft = Button(root,image=bin1.image,command=lambda: [updateItemButtonLeft()],activebackground="red")
+        itemButtonLeft = Button(root,image=bin1.image,command=lambda: [updateItemButtonLeft()],activebackground="red", justify=LEFT)
         itemButtonLeft.pack(side=LEFT)
         
-        itemButtonCenter = Button(root,image=bin2.image,command=lambda: [updateItemButtonCenter()],activebackground="red")
+        itemButtonCenter = Button(root,image=bin2.image,command=lambda: [updateItemButtonCenter()],activebackground="red", justify=CENTER)
         itemButtonCenter.pack(side=LEFT)
         
-        itemButtonRight = Button(root,image=bin3.image,command=lambda: [updateItemButtonRight()],activebackground="red")
+        itemButtonRight = Button(root,image=bin3.image,command=lambda: [updateItemButtonRight()],activebackground="red", justify=RIGHT)
         itemButtonRight.pack(side=LEFT)
         
         def updateItemButtonLeft():
@@ -89,18 +88,19 @@ def tab1():
                 if bin1.isEmpty :
                     itemButtonLeft.configure(image=photo1)
                     bin1.image = photo1
+                    bin1.isEmpty = False
                     config.set('main', 'bin1_isEmpty', 'False')
                     config.set('image', 'bin1_image', 'bin1.png')
-                    bin1.isEmpty = False
                     
                 elif not bin1.isEmpty :
                     itemButtonLeft.configure(image=empty_bin_image)
                     bin1.image = empty_bin_image
+                    bin1.isEmpty = True
                     config.set('main', 'bin1_isEmpty', 'True')
                     config.set('image', 'bin1_image', 'EmptyBin.png')
-                    bin1.isEmpty = True
+                    
                 
-                with open('config.ini', 'w') as f:
+                with open('config.ini', 'w', encoding = "locale") as f:
                     config.write(f)
                 
                 
@@ -121,7 +121,7 @@ def tab1():
                     config.set('image', 'bin2_image', 'EmptyBin.png')
                     bin2.isEmpty = True
                     
-                with open('config.ini', 'w') as f:
+                with open('config.ini', 'w', encoding = "locale") as f:
                     config.write(f)
                 
                 
@@ -142,10 +142,68 @@ def tab1():
                     config.set('image', 'bin3_image', 'EmptyBin.png')
                     bin3.isEmpty = True
                     
-                with open('config.ini', 'w') as f:
+                with open('config.ini', 'w', encoding = "locale") as f:
                     config.write(f)
+                    
+    # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
+    # --- --- --- --- --- --- --- Motion Control Screen - --- --- --- --- --- --- --- 
+    # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 
-    homeLabel=Label(root,text="HOME",font=("Times_New_Roman",25))
+    def screenMotionControl():
+        homeLabel.destroy()
+        clearWorkspaceLabel.destroy()
+        powerButton.destroy()
+        calibrateButton.destroy()
+        motionControlButton.destroy()
+        
+        
+        background_label = Label(root, image=background_image)
+        background_label.place(x=0, y=0, relwidth=1, relheight=1)
+        
+        def back():
+            backButton.destroy()
+            scale.destroy()
+            button.destroy()
+            scale2.destroy()
+            button2.destroy()
+            background_label.destroy()
+            #label.destroy()
+            tab1()
+        
+        backButton = Button(root,text="BACK",font=("Times_New_Roman",25),command=back,activebackground="red")
+        backButton.pack(side=BOTTOM)     
+                
+        # --- --- Joint 1 --- ---
+        def sel():
+            selection = "Value = " + str(var.get())
+            #label.config(text = selection)
+
+        var = DoubleVar()
+        scale = Scale( root, variable = var, orient = HORIZONTAL, length=400, resolution = 0.1, to = 260, bg ="blue", fg="white")
+        scale.place(relx=0.2,rely=0.9)
+
+        button = Button(root, text="Set Joint 1 Position", command=sel)
+        button.place(relx=0.23,rely=0.88, anchor= CENTER)
+
+         
+        # --- --- Joint 2 --- ---
+        def sel2():
+            selection2 = "Value = " + str(var.get())
+            #label.config(text = selection)
+
+        var2 = DoubleVar()
+        scale2 = Scale( root, variable = var2, orient = HORIZONTAL, length=400, resolution = 0.1, to = 260, bg ="blue", fg="white")
+        scale2.place(relx=0.18,rely=0.6)
+
+        button2 = Button(root, text="Set Joint 2 Position", command=sel2)
+        button2.place(relx=0.18,rely=0.57)
+
+        #label = Label(root)
+        #label.pack()       
+        
+
+    
+    homeLabel=Label(root,text="GripPi",font=("Times_New_Roman",25), anchor="e", justify=CENTER)
     homeLabel.pack(side=TOP)
     
     clearWorkspaceLabel=Label(root,text="Please clear the workspace before calibrating!",font=("Times_New_Roman",25))
@@ -156,8 +214,11 @@ def tab1():
     
     calibrateButton=Button(root,text="CALIBRATE",font=("Times_New_Roman",25),command=tab2,background="green",activebackground="red")
     calibrateButton.place(relx=.5,rely=.5,anchor= CENTER)
+    
+    motionControlButton=Button(root,text="GripPi Motion Control",font=("Times_New_Roman",25),command=screenMotionControl,background="green",activebackground="red")
+    motionControlButton.place(relx=0.9,rely=.9,anchor= CENTER)
+    
 
 tab1()
 
 root.mainloop()
-
