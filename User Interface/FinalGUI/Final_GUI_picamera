@@ -233,13 +233,13 @@ def screenHome():
         
         joint1data = Button(root, text = "Enter", command = lambda: [jointSend(e_1)], activebackground="green")
         joint1data.place(relx=0.925, rely = 0.5 + 0.05)
-        joint2data = Button(root, text = "Enter", command = lambda: [back()], activebackground="green")
+        joint2data = Button(root, text = "Enter", command = lambda: [jointSend(e_2)], activebackground="green")
         joint2data.place(relx=0.925, rely = 0.5 + 0.10)
-        joint3data = Button(root, text = "Enter", command = lambda: [back()], activebackground="green")
+        joint3data = Button(root, text = "Enter", command = lambda: [jointSend(e_3)], activebackground="green")
         joint3data.place(relx=0.925, rely = 0.5 + 0.15)
-        joint4data = Button(root, text = "Enter", command = lambda: [back()], activebackground="green")
+        joint4data = Button(root, text = "Enter", command = lambda: [jointSend(e_4)], activebackground="green")
         joint4data.place(relx=0.925, rely = 0.5 + 0.20)
-        joint5data = Button(root, text = "Enter", command = lambda: [back()], activebackground="green")
+        joint5data = Button(root, text = "Enter", command = lambda: [jointSend(e_5)], activebackground="green")
         joint5data.place(relx=0.925, rely = 0.5 + 0.25)
     
     homeLabel=Label(root,text="GripPi",font=("Times_New_Roman",25), anchor="e", justify=CENTER)
