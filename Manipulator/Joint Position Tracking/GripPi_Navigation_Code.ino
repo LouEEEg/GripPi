@@ -44,7 +44,7 @@
 
  //Wrist Joint Declarations
  // Driver #6 
-    #define WRIST_LIMIT 50 //standard pin          
+    #define WRIST_LIMIT 49 //standard pin          
     #define WRIST_ENA 47 //standard pin           
     #define WRIST_PUL 46 //standard pin 
     #define WRIST_DIR 45 //PWM pin
