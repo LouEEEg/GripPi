@@ -22,24 +22,28 @@
   #define WRIST_ACCELERATION 200
 
   // Base Pin Declarations
+  // Driver #1
     #define BASE_LIMIT 53  //standard pin  GREEN   
     #define BASE_ENA 11  //standard pin  WHITE             
     #define BASE_PUL 12  //standard pin  ORANGE
     #define BASE_DIR 13  //PWM pin YELLOW
 
  //shoulder joint 
+ // Driver #3/#2
     #define SHOULDER_LIMIT 52 //standard pin  GREEN     (pull down circuit)     
     #define SHOULDER_ENA 4  //standard pin (was pwm)  WHITE         
     #define SHOULDER_PUL 5  //standard pin (was pwm)  ORANGE
     #define SHOULDER_DIR 6  //PWM pin YELLOW
 
  //Elbow joint Declarations
+ // Driver #4
     #define ELBOW_LIMIT 51 //standard pin          
     #define ELBOW_ENA 32  //standard pin           
     #define ELBOW_PUL 33 //standard pin 
     #define ELBOW_DIR 34 //PWM pin
 
  //Wrist Joint Declarations
+ // Driver #6 
     #define WRIST_LIMIT 50 //standard pin          
     #define WRIST_ENA 47 //standard pin           
     #define WRIST_PUL 46 //standard pin 
