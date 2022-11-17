@@ -7,6 +7,7 @@
   #define BASE_MAX_SPEED 2000
   #define BASE_RUN_SPEED 500
   #define BASE_ACCELERATION 300
+  #define BASE_LIMIT_SOURCE 3
 
   #define SHOULDER_MAX_SPEED 2000
   #define SHOULDER_RUN_SPEED 500
@@ -68,7 +69,7 @@
   int elbow_steps = 0;
   int forarm_steps = 0;
   int wrist_steps = 0;
-  int grip_pos = 0;
+  int grip_pos = 110;
   bool base_location_reached = 0;
   bool shoulder_location_reached = 0;
   bool elbow_location_reached = 0;
@@ -96,6 +97,7 @@ void setup(){
   //homeElbowAxis();
   //homeForarmAxis();  
   //homeWristAxis();
+  Servo_Grip.write(grip_pos);
 }
 //
 
@@ -110,35 +112,35 @@ void loop(){
         //homeElbowAxis();
         //homeForarmAxis();
         //homeWristAxis();
-        delay(4000);
-        SerialUSB.println("GripI has been Calibrated! ");
+        delay(1000);
+        SerialUSB.println("GripI is Calibrated!");
         break;
     //------Bin 1------//
-      case 10: //lining up in front of the first bin 
-        SerialUSB.println("You sent value: ");
-        SerialUSB.println(user_command);
-        base_steps=2000;
-        shoulder_steps=500;
-        elbow_steps=0;
-        forarm_steps=0;
-        wrist_steps=0;
+      case 10: //lining up in front of the first bin (leftmost)
+        //SerialUSB.println("You sent value: ");
+        //SerialUSB.println(user_command);
+        base_steps=756; //17deg calculated through MATLAB
+        shoulder_steps=1145; //46.85deg
+        elbow_steps=0; //94.23deg
+        forarm_steps=0; //0deg
+        wrist_steps=0; //-51.08deg
         break;
-      case 11: //approaching the first bin
-        base_steps=2000;
-        shoulder_steps=0;
-        elbow_steps=0;
-        forarm_steps=0;
-        wrist_steps=0;
+      case 11: //grabbing the first bin
+        base_steps=756; //17deg
+        shoulder_steps=1508; //61.69deg
+        elbow_steps=0; //62.68deg
+        forarm_steps=0; //0
+        wrist_steps=0; //-34.38deg
       break;
       case 12: //grip bin
-        for (grip_pos = 0; grip_pos >= 40; grip_pos += 2) { 
+        for (grip_pos = 110; grip_pos <= 145; grip_pos += 2) { 
           Servo_Grip.write(grip_pos);         
           delay(20);              
         }       
       break;
       case 13: //photo/user location
-        base_steps=2000;
-        shoulder_steps=0;
+        base_steps=-1333;//arbitrary guess for the photo location
+        shoulder_steps=0; 
         elbow_steps=0;
         forarm_steps=0;
         wrist_steps=0;      
@@ -149,17 +151,17 @@ void loop(){
         SerialUSB.println(user_command);
         SerialUSB.println("Home GripPi");
         base_steps=0;
-        shoulder_steps=500;
-        elbow_steps=0;
-        forarm_steps=0;
-        wrist_steps=0;
+        shoulder_steps=500; //43.27deg
+        elbow_steps=0; //102.13deg
+        forarm_steps=0; //0deg
+        wrist_steps=0; //-55.39deg
         break;
-      case 21: //approaching the second bin
+      case 21: //grabbing the second bin
         base_steps=0;
-        shoulder_steps=0;
-        elbow_steps=0;
-        forarm_steps=0;
-        wrist_steps=0;
+        shoulder_steps=0; //56.6deg
+        elbow_steps=0; //73.36deg
+        forarm_steps=0; //0deg
+        wrist_steps=0; //39.96deg
       break;
       case 22: //grip bin
         for (grip_pos = 0; grip_pos >= 40; grip_pos += 2) { 
@@ -168,7 +170,7 @@ void loop(){
         }     
       break;
       case 23: //photo/user location
-        base_steps=0;
+        base_steps=-1333;
         shoulder_steps=0;
         elbow_steps=0;
         forarm_steps=0;
@@ -180,18 +182,18 @@ void loop(){
         SerialUSB.println("You sent value: ");
         SerialUSB.println(user_command);
         SerialUSB.println("Home GripPi");
-        base_steps=-2000;
-        shoulder_steps=500;
-        elbow_steps=0;
-        forarm_steps=0;
-        wrist_steps=0;
+        base_steps=-756;
+        shoulder_steps=1145; //46.85deg
+        elbow_steps=0; //94.23deg
+        forarm_steps=0; //0deg
+        wrist_steps=0; //-51.08deg
         break;
-      case 31: //approaching the third bin
-        base_steps=-2000;
-        shoulder_steps=0;
-        elbow_steps=0;
-        forarm_steps=0;
-        wrist_steps=0;
+      case 31: //grabbing the third bin
+        base_steps=-756; //17deg
+        shoulder_steps=1508; //61.69deg
+        elbow_steps=0; //62.68deg
+        forarm_steps=0; //0
+        wrist_steps=0; //-34.38deg
       break;
       case 32: //grip bin
         for (grip_pos = 0; grip_pos >= 40; grip_pos += 2) { 
@@ -200,7 +202,7 @@ void loop(){
         }       
       break;
       case 33: //photo/user location
-        base_steps=-2000;
+        base_steps=-1333;
         shoulder_steps=0;
         elbow_steps=0;
         forarm_steps=0;
@@ -288,6 +290,7 @@ void loop(){
   void homeBaseAxis(void){  
     bool base_home_set = false;
     int base_limit_reached = 0;
+    digitalWrite(BASE_LIMIT_SOURCE, HIGH);
 
     BaseStepper.enableOutputs();
 
@@ -447,6 +450,7 @@ void loop(){
 void driverInit(void){
   // Base 
     pinMode(BASE_LIMIT, INPUT);
+    pinMode(BASE_LIMIT_SOURCE, OUTPUT);
     BaseStepper.setMaxSpeed(BASE_MAX_SPEED);
     BaseStepper.setEnablePin(BASE_ENA);
     BaseStepper.setPinsInverted(false, false, true);
