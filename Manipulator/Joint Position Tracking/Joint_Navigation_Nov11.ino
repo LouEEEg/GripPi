@@ -69,7 +69,7 @@
   int elbow_steps = 0;
   int forarm_steps = 0;
   int wrist_steps = 0;
-  int grip_pos = 110;
+  int grip_pos = 90;
   bool base_location_reached = 0;
   bool shoulder_location_reached = 0;
   bool elbow_location_reached = 0;
@@ -97,7 +97,6 @@ void setup() {
   //homeElbowAxis();
   //homeForarmAxis();
   //homeWristAxis();
-  Servo_Grip.write(grip_pos);
 }
 //
 
@@ -108,14 +107,16 @@ void loop() {
     switch (user_command.toInt()) {
       case 99:  //calibration
         homeBaseAxis();
-        //homeShoulderAxis();
-        //homeElbowAxis();
+        homeShoulderAxis();
+        homeElbowAxis();
         //homeForarmAxis();
-        //homeWristAxis();
+        homeWristAxis();
+        grip_pos=90;
+        Servo_Grip.write(grip_pos);
         delay(1000);
         SerialUSB.println("GripI is Calibrated!");
         break;
-      case 0:  //move to grab the second bin
+      case 0:  //move to zero
        SerialUSB.println("Returning to zero...");
         base_steps = 0;
         shoulder_steps = 0;  //0deg
@@ -123,18 +124,52 @@ void loop() {
         forarm_steps = 0;    //0deg
         wrist_steps = 0;     //0deg
         break;
+      case 1:  //move to camera
+       SerialUSB.println("Moving to camera...");
+        base_steps = 1200;
+        shoulder_steps = 1933;  //0deg
+        elbow_steps = 8820;     //0deg
+        forarm_steps = 0;    //0deg
+        wrist_steps = 1503;     //0deg
+        break;
+      case 2:  //move to camera
+       SerialUSB.println("Moving to camera...");
+        base_steps = -1200;
+        shoulder_steps = 1933;  //0deg
+        elbow_steps = 8820;     //0deg
+        forarm_steps = 0;    //0deg
+        wrist_steps = 1503;     //0deg
+        break;      
+
+      case 3:  //grip bin
+      SerialUSB.println("Gripping...");
+        grip_pos=90;
+        for (grip_pos = 90; grip_pos <= 145; grip_pos += 2) {
+          Servo_Grip.write(grip_pos);
+          delay(20);
+        }
+        break;
+      case 4:  //grip bin
+      SerialUSB.println("Releasing...");
+        grip_pos=145;
+        for (grip_pos = 145; grip_pos >= 90; grip_pos -= 2) {
+          Servo_Grip.write(grip_pos);
+          delay(20);
+        }
+        break;
+
     //------Bin 1------//
       case 10:  //lining up in front of the first bin (leftmost)
         //SerialUSB.println("You sent value: ");
         //SerialUSB.println(user_command);
-        base_steps = 756;       //17deg
-        shoulder_steps = 1145;  //46.85deg
-        elbow_steps = 0;        //94.23deg
+        base_steps = 800;       //17deg
+        shoulder_steps = 473 ;  //19.37deg
+        elbow_steps = 12455;    //124.55deg
         forarm_steps = 0;       //0deg
-        wrist_steps = 0;        //-51.08deg
+        wrist_steps = -1048;     //-53.92deg
         break;
       case 11:                  //move to grab the first bin
-        base_steps = 756;       //17deg
+        base_steps = 800;       //17deg
         shoulder_steps = 1508;  //61.69deg
         elbow_steps = 0;        //62.68deg
         forarm_steps = 0;       //0
@@ -147,15 +182,15 @@ void loop() {
         }
         break;
       case 13:                  //lifting box
-        base_steps = -756;      //arbitrary guess for the photo location
+        base_steps = 800;      //arbitrary guess for the photo location
         shoulder_steps = 1324;  //54.18deg
         elbow_steps = 0;        //62.17deg
         forarm_steps = 0;       //0
         wrist_steps = 0;        //-26.35deg
         break;
 
-      case 14:                 //removing box
-        base_steps = -756;     //arbitrary guess for the photo location
+      case 14:                 //lowering box to cart 
+        base_steps = 800;     //arbitrary guess for the photo location
         shoulder_steps = 912;  //37.33deg
         elbow_steps = 0;       //93.77deg
         forarm_steps = 0;      //0
@@ -164,7 +199,7 @@ void loop() {
 
       case 15:               //photo/user location
         base_steps = -1333;  //arbitrary guess for the photo location
-        shoulder_steps = 0;
+        shoulder_steps = 1769;
         elbow_steps = 0;
         forarm_steps = 0;
         wrist_steps = 0;
@@ -173,45 +208,45 @@ void loop() {
       case 20:  //lining up in front of the second bin
        // SerialUSB.println("You sent value: ");
         //SerialUSB.println(user_command);
-        //SerialUSB.println("Home GripPi");
+        //SerialUSB.println("Home GripPi"); 
         base_steps = 0;         //0deg
-        shoulder_steps = 1021 ;  //deg
-        elbow_steps = 10307;    //deg
+        shoulder_steps = 438 ;  //deg
+        elbow_steps = 12676;    //deg
         forarm_steps = 0;       //0deg
-        wrist_steps = 1067;     //deg
+        wrist_steps = 1064;     //deg
         SerialUSB.println("moving...");
         break;
-      case 21:  //move to grab the second bin
+      case 21:  //move to grab the second bin 
         base_steps = 0;      //0deg
-        shoulder_steps = 1349;  //55.19deg
-        elbow_steps = 7456;     //74.55deg
+        shoulder_steps = 1327;  //55.19deg
+        elbow_steps = 7462;     //74.55deg
         forarm_steps = 0;    //0deg
-        wrist_steps = 773;     //-39.75deg
+        wrist_steps = 757;     //-39.75deg
         SerialUSB.println("moving...");
         break;
       case 22:  //grip bin
       SerialUSB.println("gripping...");
-        grip_pos=110;
-        for (grip_pos = 110; grip_pos <= 145; grip_pos += 2) {
+        grip_pos=90;
+        for (grip_pos = 90; grip_pos <= 145; grip_pos += 2) {
           Servo_Grip.write(grip_pos);
           delay(20);
-          
         }
         break;
-      case 23:   //lifting box
+
+      case 23:   //lifting box forward a bit
         base_steps = 0;      //arbitrary guess for the photo location
-        shoulder_steps = 1037;  //48.56deg
-        elbow_steps = 8436;        //72.88deg
+        shoulder_steps = 1172;  //48.56deg
+        elbow_steps = 7399;        //72.88deg
         forarm_steps = 0;       //0
-        wrist_steps = 716;        //-31.45deg
+        wrist_steps = 621;        //-31.45deg
         SerialUSB.println("moving...");
         break;
-      case 24:                 //removing box
-        base_steps = 0;     //arbitrary guess for the photo location
-        shoulder_steps = 678;  //37.33deg
-        elbow_steps = 11073;       //93.77deg
+      case 24:                 //lowering box to cart 
+        base_steps = 0;        // move 
+        shoulder_steps = 1733; //deg
+        elbow_steps = 11110;   //deg
         forarm_steps = 0;      //0
-        wrist_steps = 942;       //-41.10deg
+        wrist_steps = 1855;       //-deg
         SerialUSB.println("moving...");
         break;
       case 25:               //photo/user location
@@ -225,49 +260,54 @@ void loop() {
 
     //------Bin 3------//
       case 30:  //lining up in front of the third bin
-        SerialUSB.println("You sent value: ");
-        SerialUSB.println(user_command);
-        SerialUSB.println("Home GripPi");
-        base_steps = -756;
-        shoulder_steps = 1145;  //46.85deg
-        elbow_steps = 0;        //94.23deg
+        //SerialUSB.println("You sent value: ");
+        //SerialUSB.println(user_command);
+        //SerialUSB.println("Home GripPi");
+        base_steps = -850;
+        shoulder_steps = 473 ;  //19.37deg
+        elbow_steps = 12455;    //124.55deg
         forarm_steps = 0;       //0deg
-        wrist_steps = 0;        //-51.08deg
+        wrist_steps = -1048;     //-53.92deg
+        SerialUSB.println("moving...");
         break;
       case 31:                  //move to grab the third bin
-        base_steps = -756;      //17deg
+        base_steps = -850;      //17deg
         shoulder_steps = 1508;  //61.69deg
         elbow_steps = 0;        //62.68deg
         forarm_steps = 0;       //0
         wrist_steps = 0;        //-34.38deg
         break;
       case 32:  //grip bin
-        for (grip_pos = 110; grip_pos >= 145; grip_pos += 2) {
+        for (grip_pos = 90; grip_pos >= 145; grip_pos += 2) {
           Servo_Grip.write(grip_pos);
           delay(20);
+          SerialUSB.println("Gripping...");
         }
         break;
       case 33:                  //lifting box
-        base_steps = -756;      //-17deg
+        base_steps = -850;      //-17deg
         shoulder_steps = 1324;  //54.18deg
         elbow_steps = 0;        //62.17deg
         forarm_steps = 0;       //0
         wrist_steps = 0;        //-26.35deg
+        SerialUSB.println("moving...");
         break;
 
-      case 34:                 //removing box
-        base_steps = -756;     //arbitrary guess for the photo location
+      case 34:                 //lowering box to cart 
+        base_steps = -850;     //arbitrary guess for the photo location
         shoulder_steps = 912;  //37.33deg
         elbow_steps = 0;       //93.77deg
         forarm_steps = 0;      //0
         wrist_steps = 0;       //-41.10deg
+        SerialUSB.println("moving...");
         break;
-      case 35:  //photo/user location
+      case 35:  //photo location
         base_steps = -1333;
         shoulder_steps = 0;
         elbow_steps = 0;
         forarm_steps = 0;
         wrist_steps = 0;
+        SerialUSB.println("moving...");
         break;
 
       default:
@@ -374,7 +414,7 @@ void homeBaseAxis(void) {
 
     BaseStepper.setCurrentPosition(base_motor_position);  //motor is set to zero and motor speed is zero
     BaseStepper.setAcceleration(300);
-    BaseStepper.runToNewPosition(-6000);  //-6000 steps from the limit switch gets us very close to the zero point on the arm
+    BaseStepper.runToNewPosition(-10000);  //-6000 steps from the limit switch gets us very close to the zero point on the arm
     //~44.44 steps per degree
     BaseStepper.setCurrentPosition(base_motor_position);  //zero position is when the two arrows are lined up
     BaseStepper.disableOutputs();
@@ -388,27 +428,29 @@ void homeShoulderAxis(void) {
   int shoulder_limit_reached = 0;
 
   ShoulderStepper.enableOutputs();
+  ElbowStepper.enableOutputs();
 
   while (!shoulder_home_set) {
 
     while (!shoulder_limit_reached) {  //Joint rotates forwards
       ShoulderStepper.setSpeed(200);
       ShoulderStepper.runSpeed();
-      shoulder_limit_reached = digitalRead(!SHOULDER_LIMIT);  //this pin stays low untill limit switch is hit
+      shoulder_limit_reached = !digitalRead(SHOULDER_LIMIT);  //this pin stays low untill limit switch is hit
     }
 
     while (shoulder_limit_reached) {  //this runs when the limit switch is being held
       ShoulderStepper.setSpeed(-100);
       ShoulderStepper.runSpeed();
-      shoulder_limit_reached = digitalRead(!SHOULDER_LIMIT);
+      shoulder_limit_reached = !digitalRead(SHOULDER_LIMIT);
     }
 
     ShoulderStepper.setCurrentPosition(shoulder_motor_position);  //motor is set to zero and motor speed is zero
-    ShoulderStepper.setAcceleration(300);
-    //ShoulderStepper.runToNewPosition(-6000);//??? steps from the limit switch gets us very close to the zero point on the arm
+    ShoulderStepper.setAcceleration(200);
+    ShoulderStepper.runToNewPosition(-2200);//??? steps from the limit switch gets us very close to the zero point on the arm
     //~24.44 steps per degree
     ShoulderStepper.setCurrentPosition(shoulder_motor_position);  //zero position is when the two arrows are lined up
     ShoulderStepper.disableOutputs();
+    ElbowStepper.disableOutputs();
     shoulder_home_set = true;
   }
 }
@@ -419,28 +461,30 @@ void homeElbowAxis(void) {
   int elbow_limit_reached = 0;
 
   ElbowStepper.enableOutputs();
+  ShoulderStepper.enableOutputs();
 
   while (!elbow_home_set) {
 
     while (!elbow_limit_reached) {
 
-      ElbowStepper.setSpeed(200);  //Arm rotates forwards
+      ElbowStepper.setSpeed(1500);  //Arm rotates forwards
       ElbowStepper.runSpeed();
-      elbow_limit_reached = digitalRead(!ELBOW_LIMIT);  //this pin stays low untill limit switch is hit
+      elbow_limit_reached = !digitalRead(ELBOW_LIMIT);  //this pin stays low untill limit switch is hit
     }
 
     while (elbow_limit_reached) {  //this runs when the limit switch is being held
-      ElbowStepper.setSpeed(-100);
+      ElbowStepper.setSpeed(-1000);
       ElbowStepper.runSpeed();
-      elbow_limit_reached = digitalRead(!ELBOW_LIMIT);
+      elbow_limit_reached = !digitalRead(ELBOW_LIMIT);
     }
 
     ElbowStepper.setCurrentPosition(elbow_motor_position);  //motor is set to zero and motor speed is zero
-    ElbowStepper.setAcceleration(300);
-    //ElbowStepper.runToNewPosition();//Zero point after calibration
+    ElbowStepper.setAcceleration(800);
+    ElbowStepper.runToNewPosition(-9000);//Zero point after calibration
 
     ElbowStepper.setCurrentPosition(elbow_motor_position);  //zero position is when the two arrows are lined up
     ElbowStepper.disableOutputs();
+    ShoulderStepper.disableOutputs();
     elbow_home_set = true;
   }
 }
@@ -486,24 +530,30 @@ void homeWristAxis(void) {
 
     while (!wrist_limit_reached) {
 
-      WristStepper.setSpeed(100);  //Arm rotates forwards
+      WristStepper.setSpeed(-200);  //Arm rotates forwards
       WristStepper.runSpeed();
-      wrist_limit_reached = digitalRead(!WRIST_LIMIT);  //this pin stays low untill limit switch is hit
+      wrist_limit_reached = !digitalRead(WRIST_LIMIT);  //this pin stays low untill limit switch is hit
     }
 
     while (wrist_limit_reached) {  //this runs when the limit switch is being held
-      WristStepper.setSpeed(-100);
+      WristStepper.setSpeed(100);
       WristStepper.runSpeed();
-      wrist_limit_reached = digitalRead(!WRIST_LIMIT);
+      wrist_limit_reached = !digitalRead(WRIST_LIMIT);
     }
 
     WristStepper.setCurrentPosition(wrist_motor_position);  //motor is set to zero and motor speed is zero
     WristStepper.setAcceleration(300);
-    //WristStepper.runToNewPosition();//Zero point after calibration
+    WristStepper.runToNewPosition(1750);//Zero point after calibration
 
     WristStepper.setCurrentPosition(wrist_motor_position);  //zero position is when the two arrows are lined up
     WristStepper.disableOutputs();
     wrist_home_set = true;
+
+    BaseStepper.enableOutputs();
+    BaseStepper.setAcceleration(300);
+    BaseStepper.runToNewPosition(4000);
+    BaseStepper.setCurrentPosition(base_motor_position); //motor is set to zero and motor speed is zero 
+    BaseStepper.disableOutputs();
   }
 }
 //
