@@ -59,15 +59,22 @@ bin1 = gripPiBin(config.getboolean('main', 'bin1_isEmpty'), bin1_image)
 bin2 = gripPiBin(config.getboolean('main', 'bin2_isEmpty'), bin2_image)
 bin3 = gripPiBin(config.getboolean('main', 'bin3_isEmpty'), bin3_image)
 
+gripPi_calibration = False
 
 def close_gui():
     sys.exit()
 
 def calibrate():
     homeSet = GripPiSerial(99)
+    gripPi_calibtration = True;
 
+def checkCalibrate():
+    if(gripPi_calibration):
+        screenItemSelect()
+    else:
+        tkintkinter.messagebox.showerror("GripPi Must be calibrated prior to use!")
+        
 def screenHome():
-    
     
     # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
     # --- --- --- --- --- --- --- Item Selection Screen - --- --- --- --- --- --- --- 
@@ -268,16 +275,17 @@ def screenHome():
     powerButton=Button(root,text="POWER",font=("Times_New_Roman",25),command=close_gui,activebackground="red")
     powerButton.pack(side=BOTTOM)
     
-    calibrateButton=Button(root,text="CALIBRATE",font=("Times_New_Roman",25),command = lambda: [screenItemSelect(),calibrate()],background="green",activebackground="red")
+    calibrateButton=Button(root,text="CALIBRATE",font=("Times_New_Roman",25),command = lambda: [calibrate()],background="green",activebackground="red")
     calibrateButton.place(relx=.5,rely=.5,anchor= CENTER)
     
     #motionControlButton=Button(root,text="GripPi Motion Control",font=("Times_New_Roman",25),command=screenMotionControl,background="green",activebackground="red")
     #motionControlButton.place(relx=0.9,rely=.9,anchor= CENTER)
     
-    binsButton=Button(root, text="BINS", font=("Times_New_Roman",25), command = lambda: [screenItemSelect()], background="green",activebackground="red")
+    binsButton=Button(root, text="BINS", font=("Times_New_Roman",25), command = lambda: [checkCalibrate()], background="green",activebackground="red")
     binsButton.place(relx=.5,rely=0.7,anchor= CENTER)
     
 
 screenHome()
 
 root.mainloop()
+
