@@ -1,4 +1,5 @@
 from tkinter import*
+from tkinter import messagebox
 from configparser import ConfigParser
 #from smbus2 import SMBus, i2c_msg
 import serial
@@ -35,9 +36,10 @@ photo3 = PhotoImage(file = "bin3.png")
 empty_bin_image = PhotoImage(file = "EmptyBin_small.png")
 
 class gripPiBin:
-    def __init__(self, isEmpty, image):
+    def __init__(self, isEmpty, image, states_pick):
         self.isEmpty = isEmpty
         self.image = image
+        self.states_pick = states_pick
 
 def GripPiSerial(GripPiTx):
     GripPiRx=77
@@ -55,9 +57,17 @@ bin1_image = PhotoImage(file = config.get('image', 'bin1_image'))
 bin2_image = PhotoImage(file = config.get('image', 'bin2_image'))
 bin3_image = PhotoImage(file = config.get('image', 'bin3_image'))
 
-bin1 = gripPiBin(config.getboolean('main', 'bin1_isEmpty'), bin1_image)
-bin2 = gripPiBin(config.getboolean('main', 'bin2_isEmpty'), bin2_image)
-bin3 = gripPiBin(config.getboolean('main', 'bin3_isEmpty'), bin3_image)
+bin1_states_pick = [10,11,3,12,10,5,6,2]
+bin2_states_pick = [20,21,3,22,20,5,6,2]
+bin3_states_pick = [30,31,3,32,30,5,6,2]
+
+bin1_states_place = [8,7,10,12,11,4,12,10,0]
+bin2_states_place = [8,7,20,22,21,4,22,20,0]
+bin3_states_place = [8,7,30,32,31,4,32,30,0]
+
+bin1 = gripPiBin(config.getboolean('main', 'bin1_isEmpty'), bin1_image, bin1_states_pick)
+bin2 = gripPiBin(config.getboolean('main', 'bin2_isEmpty'), bin2_image, bin2_states_pick)
+bin3 = gripPiBin(config.getboolean('main', 'bin3_isEmpty'), bin3_image, bin3_states_pick)
 
 gripPi_calibration = False
 
@@ -65,21 +75,24 @@ def close_gui():
     sys.exit()
 
 def calibrate():
+    messagebox.showwarning("WARNING", "Clear Workspace before Calibrating")
     homeSet = GripPiSerial(99)
-    gripPi_calibtration = True;
+    global gripPi_calibration
+    gripPi_calibration = True 
 
-def checkCalibrate():
-    if(gripPi_calibration):
-        screenItemSelect()
-    else:
-        tkintkinter.messagebox.showerror("GripPi Must be calibrated prior to use!")
-        
 def screenHome():
+    
+    def isCalibrated():
+        if(not(gripPi_calibration)):
+            messagebox.showerror("ERROR", "GripPi Must be calibrated prior to use!")
+        else:
+            screenItemSelect()
     
     # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
     # --- --- --- --- --- --- --- Item Selection Screen - --- --- --- --- --- --- --- 
     # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     def screenItemSelect():
+        
         homeLabel.destroy()
         clearWorkspaceLabel.destroy()
         powerButton.destroy()
@@ -88,20 +101,19 @@ def screenHome():
         binsButton.destroy()
 
         #Top of page 2
-        label21=Label(root, text="Select an Item", font=("Times_New_Roman",25), anchor="e", justify=CENTER)
-        label21.pack(side=TOP)
+        selectItemLabel=Label(root, text="Select an Item", font=("Times_New_Roman",25), anchor="e", justify=CENTER)
+        selectItemLabel.pack(side=TOP)
         
                 
         #homeSet = GripPiSerial(99)
         
         def back():
-            label21.destroy()
+            selectItemLabel.destroy()
             backButton.destroy()
             itemButtonLeft.destroy()
             itemButtonCenter.destroy()
             itemButtonRight.destroy()
             screenHome()
-            
         
         
         backButton = Button(root,text="BACK",font=("Times_New_Roman",25),command=lambda: [back()],activebackground="red")
@@ -120,15 +132,22 @@ def screenHome():
             if itemButtonLeft:
                 
                 if bin1.isEmpty :
+                    homeset = GripPiSerial(1)
+                    time.sleep(9)
                     picam2.capture_file("bin1.png")
                     photo1 = PhotoImage(file = "bin1.png")
                     bin1.image = photo1
                     bin1.isEmpty = False
                     config.set('main', 'bin1_isEmpty', 'False')
                     config.set('image', 'bin1_image', 'bin1.png')
+                    for x in range(9):
+                        homeset = GripPiSerial(bin1_states_place[x])
                     itemButtonLeft.configure(image = photo1)
+ 
                     
                 elif not bin1.isEmpty :
+                    for x in range(8):
+                        homeset = GripPiSerial(bin1_states_pick[x])
                     itemButtonLeft.configure(image=empty_bin_image)
                     bin1.image = empty_bin_image
                     bin1.isEmpty = True
@@ -145,6 +164,8 @@ def screenHome():
             if itemButtonCenter:
                 
                 if bin2.isEmpty :
+                    homeset = GripPiSerial(1)
+                    time.sleep(9)
                     picam2.capture_file("bin2.png")
                     photo2 = PhotoImage(file = "bin2.png")
                     itemButtonCenter.configure(image=photo2)
@@ -152,8 +173,13 @@ def screenHome():
                     config.set('main', 'bin2_isEmpty', 'False')
                     config.set('image', 'bin2_image', 'bin2.png')
                     bin2.isEmpty = False
+                    for x in range(9):
+                        homeset = GripPiSerial(bin2_states_place[x])
+                    itemButtonCenter.configure(image = photo2) 
                     
                 elif not bin2.isEmpty :
+                    for x in range(8):
+                        homeset = GripPiSerial(bin2_states_pick[x])
                     itemButtonCenter.configure(image=empty_bin_image)
                     bin2.image = empty_bin_image
                     config.set('main', 'bin2_isEmpty', 'True')
@@ -169,6 +195,8 @@ def screenHome():
             if itemButtonRight:
                 
                 if bin3.isEmpty :
+                    homeset = GripPiSerial(1)
+                    time.sleep(9)
                     picam2.capture_file("bin3.png")
                     photo3 = PhotoImage(file = "bin3.png")
                     itemButtonRight.configure(image=photo3)
@@ -176,8 +204,13 @@ def screenHome():
                     config.set('main', 'bin3_isEmpty', 'False')
                     config.set('image', 'bin3_image', 'bin3.png')
                     bin3.isEmpty = False
+                    for x in range(9):
+                        homeset = GripPiSerial(bin3_states_place[x])
+                    itemButtonRight.configure(image = photo3)
                     
                 elif not bin3.isEmpty :
+                    for x in range(8):
+                        homeset = GripPiSerial(bin3_states_pick[x])
                     itemButtonRight.configure(image=empty_bin_image)
                     bin3.image = empty_bin_image
                     config.set('main', 'bin3_isEmpty', 'True')
@@ -270,22 +303,21 @@ def screenHome():
     homeLabel.pack(side=TOP)
     
     clearWorkspaceLabel=Label(root,text="Please clear the workspace before calibrating!",font=("Times_New_Roman",25))
-    clearWorkspaceLabel.place(relx=.5,rely=.6,anchor=CENTER)
+    clearWorkspaceLabel.place(relx=.5,rely=.5,anchor=CENTER)
     
     powerButton=Button(root,text="POWER",font=("Times_New_Roman",25),command=close_gui,activebackground="red")
     powerButton.pack(side=BOTTOM)
     
-    calibrateButton=Button(root,text="CALIBRATE",font=("Times_New_Roman",25),command = lambda: [calibrate()],background="green",activebackground="red")
-    calibrateButton.place(relx=.5,rely=.5,anchor= CENTER)
+    calibrateButton=Button(root,text="CALIBRATE",font=("Times_New_Roman",75),command = lambda: [calibrate()],background="green",activebackground="red")
+    calibrateButton.place(relx=.5,rely=.25,anchor= CENTER)
     
     #motionControlButton=Button(root,text="GripPi Motion Control",font=("Times_New_Roman",25),command=screenMotionControl,background="green",activebackground="red")
     #motionControlButton.place(relx=0.9,rely=.9,anchor= CENTER)
     
-    binsButton=Button(root, text="BINS", font=("Times_New_Roman",25), command = lambda: [checkCalibrate()], background="green",activebackground="red")
-    binsButton.place(relx=.5,rely=0.7,anchor= CENTER)
+    binsButton=Button(root, text="BINS", font=("Times_New_Roman",100), command = lambda: [isCalibrated()], background="green",activebackground="red")
+    binsButton.place(relx=.5,rely=0.725,anchor= CENTER)
     
 
 screenHome()
 
 root.mainloop()
-
