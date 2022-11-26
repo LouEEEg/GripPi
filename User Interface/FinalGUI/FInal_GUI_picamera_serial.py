@@ -65,6 +65,9 @@ bin1_states_place = [8,7,10,12,11,4,12,10,0]
 bin2_states_place = [8,7,20,22,21,4,22,20,0]
 bin3_states_place = [8,7,30,32,31,4,32,30,0]
 
+gripPi_states_off = [6,97]
+gripPi_states_on = [96]
+
 bin1 = gripPiBin(config.getboolean('main', 'bin1_isEmpty'), bin1_image, bin1_states_pick)
 bin2 = gripPiBin(config.getboolean('main', 'bin2_isEmpty'), bin2_image, bin2_states_pick)
 bin3 = gripPiBin(config.getboolean('main', 'bin3_isEmpty'), bin3_image, bin3_states_pick)
@@ -72,11 +75,14 @@ bin3 = gripPiBin(config.getboolean('main', 'bin3_isEmpty'), bin3_image, bin3_sta
 gripPi_calibration = False
 
 def close_gui():
+    for x in range(2):
+        homeset = GripPiSerial(gripPi_states_off[x])
+    #time.sleep()
     sys.exit()
 
 def calibrate():
     messagebox.showwarning("WARNING", "Clear Workspace before Calibrating")
-    homeSet = GripPiSerial(99)
+    homeSet = GripPiSerial(96)
     global gripPi_calibration
     gripPi_calibration = True 
 
