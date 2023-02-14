@@ -136,7 +136,9 @@ def screenHome():
         
         def updateItemButtonLeft():
             if itemButtonLeft:
-                
+                itemButtonCenter.destroy()
+                itemButtonRight.destroy()
+                    
                 if bin1.isEmpty :
                     homeset = GripPiSerial(1)
                     time.sleep(9)
@@ -165,9 +167,13 @@ def screenHome():
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
                     config.write(f)
                 
+                itemButtonCenter.display()
+                itemButtonRight.display()
                 
         def updateItemButtonCenter():
-            if itemButtonCenter:
+            if itemButtonCenter:                 
+                itemButtonLeft.destroy()
+                itemButtonRight.destroy()
                 
                 if bin2.isEmpty :
                     homeset = GripPiSerial(1)
@@ -196,9 +202,13 @@ def screenHome():
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
                     config.write(f)
                 
+                itemButtonLeft.display()
+                itemButtonRight.display()
                 
         def updateItemButtonRight():
-            if itemButtonRight:
+            if itemButtonRight:                
+                itemButtonLeft.destroy()
+                itemButtonCenter.destroy()
                 
                 if bin3.isEmpty :
                     homeset = GripPiSerial(1)
@@ -227,6 +237,9 @@ def screenHome():
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
                     config.write(f)
                     
+                itemButtonLeft.display()
+                itemButtonCenter.display()
+                
     # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
     # --- --- --- --- --- --- --- Motion Control Screen - --- --- --- --- --- --- --- 
     # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
