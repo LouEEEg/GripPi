@@ -41,6 +41,13 @@ class gripPiBin:
         self.image = image
         self.states_pick = states_pick
 
+#START - NEW ADDITIONS - 02/15/2023
+class widgets:
+    def __init__(self, Button):
+        self.Button = Button
+          
+#END - NEW ADDITIONS - 02/15/2023
+
 def GripPiSerial(GripPiTx):
     GripPiRx=77
     
@@ -74,6 +81,19 @@ bin3 = gripPiBin(config.getboolean('main', 'bin3_isEmpty'), bin3_image, bin3_sta
 
 gripPi_calibration = False
 
+#START - NEW ADDITIONS (WIP) - 02/13/2023 
+#bin1_to_user = False
+
+#bin2_to_user = False
+
+#bin3_to_user = False
+
+#def to_user1():
+    #global bin1_to_user
+    #bin1_to_user = True
+    
+#END - NEW ADDITIONS (WIP) - 02/13/2023
+
 def close_gui():
     for x in range(2):
         homeset = GripPiSerial(gripPi_states_off[x])
@@ -86,11 +106,19 @@ def calibrate():
     global gripPi_calibration
     gripPi_calibration = True 
 
+#START - NEW ADDITIONS - 02/15/2023
+def forget(widget):
+    widget.pack_forget
+
+def retrieve(widget):
+    widget.pack(side=LEFT)
+#END - NEW ADDITIONS - 02/15/2023
+    
 def screenHome():
     
     def isCalibrated():
         if(not(gripPi_calibration)):
-            messagebox.showerror("ERROR", "GripPi Must be calibrated prior to use!")
+            messagebox.showerror("ERROR", "GripPi must be calibrated prior to use!")
         else:
             screenItemSelect()
     
@@ -121,6 +149,12 @@ def screenHome():
             itemButtonRight.destroy()
             screenHome()
         
+        #START - NEW ADDITIONS - 02/15/2023
+        def refresh():
+            itemButtonLeft()
+            itemButtonCenter()
+            itemButtonRight()
+        #END - NEW ADDITIONS - 02/15/2023   
         
         backButton = Button(root,text="BACK",font=("Times_New_Roman",25),command=lambda: [back()],activebackground="red")
         backButton.pack(side=BOTTOM)
@@ -134,47 +168,43 @@ def screenHome():
         itemButtonRight = Button(root,image=bin3.image,command=lambda: [updateItemButtonRight()],activebackground="red", justify=RIGHT)
         itemButtonRight.pack(side=LEFT)
         
-        def updateItemButtonLeft():
+        def updateItemButtonLeft():  
             if itemButtonLeft:
-                itemButtonCenter.destroy()
-                itemButtonRight.destroy()
-                    
+                itemButtonCenter.pack_forget()
+                itemButtonRight.pack_forget()
                 if bin1.isEmpty :
                     homeset = GripPiSerial(1)
                     time.sleep(9)
                     picam2.capture_file("bin1.png")
                     photo1 = PhotoImage(file = "bin1.png")
+                    itemButtonLeft.configure(image=photo1)
                     bin1.image = photo1
-                    bin1.isEmpty = False
                     config.set('main', 'bin1_isEmpty', 'False')
                     config.set('image', 'bin1_image', 'bin1.png')
+                    bin1.isEmpty = False
+                    retrieve(itemButtonCenter)
+                    retrieve(itemButtonRight)
                     for x in range(9):
                         homeset = GripPiSerial(bin1_states_place[x])
                     itemButtonLeft.configure(image = photo1)
- 
-                    
+                      
                 elif not bin1.isEmpty :
                     for x in range(8):
                         homeset = GripPiSerial(bin1_states_pick[x])
                     itemButtonLeft.configure(image=empty_bin_image)
                     bin1.image = empty_bin_image
-                    bin1.isEmpty = True
                     config.set('main', 'bin1_isEmpty', 'True')
                     #config.set('image', 'bin1_image', 'EmptyBin.png')
                     config.set('image', 'bin1_image', 'EmptyBin_small.png')
-                    
+                    bin1.isEmpty = True
                 
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
-                    config.write(f)
-                
-                itemButtonCenter.display()
-                itemButtonRight.display()
+                    config.write(f)                                          
                 
         def updateItemButtonCenter():
-            if itemButtonCenter:                 
-                itemButtonLeft.destroy()
-                itemButtonRight.destroy()
-                
+            if itemButtonCenter:
+                itemButtonLeft.pack_forget()
+                itemButtonRight.pack_forget()
                 if bin2.isEmpty :
                     homeset = GripPiSerial(1)
                     time.sleep(9)
@@ -185,6 +215,8 @@ def screenHome():
                     config.set('main', 'bin2_isEmpty', 'False')
                     config.set('image', 'bin2_image', 'bin2.png')
                     bin2.isEmpty = False
+                    retrieve(itemButtonLeft)
+                    retrieve(itemButtonRight)
                     for x in range(9):
                         homeset = GripPiSerial(bin2_states_place[x])
                     itemButtonCenter.configure(image = photo2) 
@@ -202,14 +234,10 @@ def screenHome():
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
                     config.write(f)
                 
-                itemButtonLeft.display()
-                itemButtonRight.display()
-                
         def updateItemButtonRight():
-            if itemButtonRight:                
-                itemButtonLeft.destroy()
-                itemButtonCenter.destroy()
-                
+            if itemButtonRight:
+                itemButtonLeft.pack_forget()
+                itemButtonCenter.pack_forget()
                 if bin3.isEmpty :
                     homeset = GripPiSerial(1)
                     time.sleep(9)
@@ -220,6 +248,8 @@ def screenHome():
                     config.set('main', 'bin3_isEmpty', 'False')
                     config.set('image', 'bin3_image', 'bin3.png')
                     bin3.isEmpty = False
+                    retrieve(itemButtonLeft)
+                    retrieve(itemButtonCenter)
                     for x in range(9):
                         homeset = GripPiSerial(bin3_states_place[x])
                     itemButtonRight.configure(image = photo3)
@@ -236,9 +266,6 @@ def screenHome():
                     
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
                     config.write(f)
-                    
-                itemButtonLeft.display()
-                itemButtonCenter.display()
                 
     # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
     # --- --- --- --- --- --- --- Motion Control Screen - --- --- --- --- --- --- --- 
