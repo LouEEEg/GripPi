@@ -81,18 +81,10 @@ bin3 = gripPiBin(config.getboolean('main', 'bin3_isEmpty'), bin3_image, bin3_sta
 
 gripPi_calibration = False
 
-#START - NEW ADDITIONS (WIP) - 02/13/2023 
-#bin1_to_user = False
-
-#bin2_to_user = False
-
-#bin3_to_user = False
-
-#def to_user1():
-    #global bin1_to_user
-    #bin1_to_user = True
-    
-#END - NEW ADDITIONS (WIP) - 02/13/2023
+#02/27/2023
+global Bin_in
+Bin_in = True
+#02/27/2023
 
 def close_gui():
     for x in range(2):
@@ -134,7 +126,7 @@ def screenHome():
         #motionControlButton.destroy()
         binsButton.destroy()
 
-        #Top of page 2
+        # --- --- --- Top of page 2 --- --- --- #
         selectItemLabel=Label(root, text="Select an Item", font=("Times_New_Roman",25), anchor="e", justify=CENTER)
         selectItemLabel.pack(side=TOP)
         
@@ -147,16 +139,19 @@ def screenHome():
             itemButtonLeft.destroy()
             itemButtonCenter.destroy()
             itemButtonRight.destroy()
-            screenHome()
+            screenHome()  
         
-        #START - NEW ADDITIONS - 02/15/2023
-        def refresh():
-            itemButtonLeft()
-            itemButtonCenter()
-            itemButtonRight()
-        #END - NEW ADDITIONS - 02/15/2023   
-        
-        backButton = Button(root,text="BACK",font=("Times_New_Roman",25),command=lambda: [back()],activebackground="red")
+        #02/27/2023
+        def isReturned():
+             global Bin_in
+             if(not(Bin_in)):
+                 messagebox.showerror("ERROR", "Bin must be returned to storage!")
+             else:
+                 Bin_in = True
+                 back()
+        #02/27/2023
+                 
+        backButton = Button(root,text="BACK",font=("Times_New_Roman",25),command=lambda: [isReturned()],activebackground="red")
         backButton.pack(side=BOTTOM)
         
         itemButtonLeft = Button(root,image=bin1.image,command=lambda: [updateItemButtonLeft()],activebackground="red", justify=LEFT)
@@ -181,6 +176,10 @@ def screenHome():
                     bin1.image = photo1
                     config.set('main', 'bin1_isEmpty', 'False')
                     config.set('image', 'bin1_image', 'bin1.png')
+                    #02/27/2023
+                    global Bin_in
+                    Bin_in = True
+                    #02/27/2023
                     bin1.isEmpty = False
                     retrieve(itemButtonCenter)
                     retrieve(itemButtonRight)
@@ -196,6 +195,9 @@ def screenHome():
                     config.set('main', 'bin1_isEmpty', 'True')
                     #config.set('image', 'bin1_image', 'EmptyBin.png')
                     config.set('image', 'bin1_image', 'EmptyBin_small.png')
+                    #02/27/2023
+                    Bin_in = False
+                    #02/27/2023
                     bin1.isEmpty = True
                 
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
@@ -214,6 +216,10 @@ def screenHome():
                     bin2.image = photo2
                     config.set('main', 'bin2_isEmpty', 'False')
                     config.set('image', 'bin2_image', 'bin2.png')
+                    #02/27/2023
+                    global Bin_in
+                    Bin_in = True
+                    #02/27/2023
                     bin2.isEmpty = False
                     retrieve(itemButtonLeft)
                     retrieve(itemButtonRight)
@@ -229,6 +235,9 @@ def screenHome():
                     config.set('main', 'bin2_isEmpty', 'True')
                     #config.set('image', 'bin2_image', 'EmptyBin.png')
                     config.set('image', 'bin2_image', 'EmptyBin_small.png')
+                    #02/27/2023
+                    Bin_in = False
+                    #02/27/2023
                     bin2.isEmpty = True
                     
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
@@ -247,6 +256,10 @@ def screenHome():
                     bin3.image = photo3
                     config.set('main', 'bin3_isEmpty', 'False')
                     config.set('image', 'bin3_image', 'bin3.png')
+                    #02/27/2023
+                    global Bin_in
+                    Bin_in = True
+                    #02/27/2023
                     bin3.isEmpty = False
                     retrieve(itemButtonLeft)
                     retrieve(itemButtonCenter)
@@ -262,6 +275,9 @@ def screenHome():
                     config.set('main', 'bin3_isEmpty', 'True')
                     #config.set('image', 'bin3_image', 'EmptyBin.png')
                     config.set('image', 'bin3_image', 'EmptyBin_small.png')
+                    #02/27/2023
+                    Bin_in = False
+                    #02/27/2023
                     bin3.isEmpty = True
                     
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
