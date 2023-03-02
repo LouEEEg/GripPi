@@ -86,25 +86,34 @@ global Bin_in
 Bin_in = True
 #02/27/2023
 
-def close_gui():
-    for x in range(2):
-        homeset = GripPiSerial(gripPi_states_off[x])
-    #time.sleep()
-    sys.exit()
-
+#def close_gui():
+    #for x in range(2):
+        #homeset = GripPiSerial(gripPi_states_off[x])
+    ##time.sleep()
+    #sys.exit()
+    
 def calibrate():
     messagebox.showwarning("WARNING", "Clear Workspace before Calibrating")
     homeSet = GripPiSerial(96)
     global gripPi_calibration
     gripPi_calibration = True 
 
-#START - NEW ADDITIONS - 02/15/2023
+#03/01/2023
+def close_gui():
+    if(not(gripPi_calibration)):
+        sys.exit()
+    else:  
+        for x in range(2):
+            homeset = GripPiSerial(gripPi_states_off[x])
+        #time.sleep()
+        sys.exit()
+#03/01/2023
+
 def forget(widget):
     widget.pack_forget
 
 def retrieve(widget):
     widget.pack(side=LEFT)
-#END - NEW ADDITIONS - 02/15/2023
     
 def screenHome():
     
