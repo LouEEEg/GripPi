@@ -27,7 +27,7 @@
   //------wrist------//
     #define WRIST_MAX_SPEED 2000
     #define WRIST_RUN_SPEED 500
-    #define WRIST_ACCELERATION 200
+    #define WRIST_ACCELERATION 300
 //------Joint Declarations------//
   // Base Joint Declarations //Driver #1
     #define BASE_LIMIT 10  //standard pin  GREEN
