@@ -70,54 +70,54 @@
 // ----- Manipulator Structure ----- //
 // --------------------------------- //
 typedef struct{
-    struct{
-      // Length: Joint 2 Joint, in mm
-      float base_2_shoulder = 221;
-      float shoulder_2_elbow = 221; 
-      float elbow_2_wrist = 218; 
-      float wrist_2_gripper = 147;
-    }length;
+  struct{
+    // Length: Joint 2 Joint, in mm
+    float base_2_shoulder = 221;
+    float shoulder_2_elbow = 221; 
+    float elbow_2_wrist = 218; 
+    float wrist_2_gripper = 147;
+  }length;
 
-    struct {
-      // Angle of each joint in RAD
-      float base = 0;
-      float shoulder = 0;
-      float elbow = 0;
-      float wrist = 0;
-    }angle;
+  struct {
+    // Angle of each joint in RAD
+    float base = 0;
+    float shoulder = 0;
+    float elbow = 0;
+    float wrist = 0;
+  }angle;
 
-    struct {
-      // Number of steps to run 
-      int base = 0;
-      int shoulder = 0;
-      int elbow = 0;
-      int forearm = 0;
-      int wrist = 0;
-      int gripper = 0;
-    }steps;
+  struct {
+    // Number of steps to run 
+    int base = 0;
+    int shoulder = 0;
+    int elbow = 0;
+    int forearm = 0;
+    int wrist = 0;
+    int gripper = 0;
+  }steps;
 
-    struct{
-      // Position of each angle 
-      long base = 0;
-      long shoulder = 0;
-      long elbow = 0;
-      long forearm = 0;
-      long wrist = 0;
-    }position;
+  struct{
+    // Position of each angle 
+    long base = 0;
+    long shoulder = 0;
+    long elbow = 0;
+    long forearm = 0;
+    long wrist = 0;
+  }position;
 
-    struct{
-      // Goal Position, distance is reach of the arm
-      float distance = 0;
-      float x = 0;
-      float y = 0;
-      float z = 0;
-    }goal;
+  struct{
+    // Goal Position, distance is reach of the arm
+    float distance = 0;
+    float x = 0;
+    float y = 0;
+    float z = 0;
+  }goal;
 
-    struct{
-      float x = 0;
-      float y = 0;
-      float z = 0;
-    }pose;
+  struct{
+    float x = 0;
+    float y = 0;
+    float z = 0;
+  }pose;
 }Manipulator;
 
 typedef struct{
