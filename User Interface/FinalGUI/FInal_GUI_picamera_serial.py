@@ -6,7 +6,8 @@ import serial
 import time
 import sys
 from picamera2 import Picamera2, Preview
-
+import cv2
+import os
 
 #RESOLUTION = "1920x1080"
 RESOLUTION = "1024x768"
@@ -68,6 +69,8 @@ bin1_states_pick = [10,11,3,12,10,5,6,2]
 bin2_states_pick = [20,21,3,22,20,5,6,2]
 bin3_states_pick = [30,31,3,32,30,5,6,2]
 
+# <x,y,z> where x,y,z are int
+
 bin1_states_place = [8,7,10,12,11,4,12,10,0]
 bin2_states_place = [8,7,20,22,21,4,22,20,0]
 bin3_states_place = [8,7,30,32,31,4,32,30,0]
@@ -93,7 +96,7 @@ Bin_in = True
     #sys.exit()
     
 def calibrate():
-    messagebox.showwarning("WARNING", "Clear Workspace before Calibrating")
+    messagebox.showwarning("WARNING", "Clear workspace before Calibrating")
     homeSet = GripPiSerial(96)
     global gripPi_calibration
     gripPi_calibration = True 
@@ -101,6 +104,7 @@ def calibrate():
 #03/01/2023
 def close_gui():
     if(not(gripPi_calibration)):
+        homeSet = GripPiSerial(95)
         sys.exit()
     else:  
         for x in range(2):
@@ -132,7 +136,7 @@ def screenHome():
         clearWorkspaceLabel.destroy()
         powerButton.destroy()
         calibrateButton.destroy()
-        #motionControlButton.destroy()
+        motionControlButton.destroy()
         binsButton.destroy()
 
         # --- --- --- Top of page 2 --- --- --- #
@@ -296,46 +300,48 @@ def screenHome():
     # --- --- --- --- --- --- --- Motion Control Screen - --- --- --- --- --- --- --- 
     # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 
-    #def screenMotionControl():
-        #homeLabel.destroy()
-        #clearWorkspaceLabel.destroy()
-        #powerButton.destroy()
-        #calibrateButton.destroy()
-        #motionControlButton.destroy()
-        #binsButton.destroy()
-        
+    def screenMotionControl():
+        homeLabel.destroy()
+        clearWorkspaceLabel.destroy()
+        powerButton.destroy()
+        calibrateButton.destroy()
+        motionControlButton.destroy()
+        binsButton.destroy()     
         
         #background_label = Label(root, image=background_image)
         #background_label.place(x=0, y=0, relwidth=1, relheight=1)
         
-        #def back():
-            #backButton.destroy()
-            #scale.destroy()
-            #button.destroy()
-            #scale2.destroy()
-            #button2.destroy()
-            #background_label.destroy()
-            #label.destroy()
-            #joint1.destroy()
-            #joint2.destroy()
-            #joint3.destroy()
-            #joint4.destroy()
-            #joint5.destroy()
-            #e_1.destroy()
-            #e_2.destroy()
-            #e_3.destroy()
-            #e_4.destroy()
-            #e_5.destroy()
-            #joint1data.destroy()
-            #joint2data.destroy()
-            #joint3data.destroy()
-            #joint4data.destroy()
-            #joint5data.destroy()
-            #screenHome()
+        def back():
+            backButton.destroy()
+            MeasureButtonLeft.destroy()
+            MeasureButtonCenter.destroy()
+            MeasureButtonRight.destroy()
+            screenHome()
+            
+        def MeasureLeft():
+            cmd1 = "python '/home/grippi/GripPi Project (GUI)/Final/OpenCV_test.py' --image '/home/grippi/GripPi Project (GUI)/Final/bin1.png' --width 0.7900"
+            os.system(cmd1)
         
-        #backButton = Button(root,text="BACK",font=("Times_New_Roman",25),command=lambda: [back()],activebackground="red")
-        #backButton.pack(side=BOTTOM)
+        def MeasureCenter():
+            cmd2 = "python '/home/grippi/GripPi Project (GUI)/Final/OpenCV_test.py' --image '/home/grippi/GripPi Project (GUI)/Final/bin2.png' --width 0.7900"
+            os.system(cmd2)
+       
+        def MeasureRight():
+            cmd3 = "python '/home/grippi/GripPi Project (GUI)/Final/OpenCV_test.py' --image '/home/grippi/GripPi Project (GUI)/Final/bin3.png' --width 0.7900"
+            os.system(cmd3)
+       
+        backButton = Button(root,text="BACK",font=("Times_New_Roman",25),command=lambda: [back()],activebackground="red")
+        backButton.pack(side=BOTTOM)
         
+        MeasureButtonLeft = Button(root,image=bin1.image,command=lambda: [MeasureLeft()],activebackground="red", justify=LEFT)
+        MeasureButtonLeft.pack(side=LEFT)
+       
+        MeasureButtonCenter = Button(root,image=bin2.image,command=lambda: [MeasureCenter()],activebackground="red", justify=CENTER)
+        MeasureButtonCenter.pack(side=LEFT)
+        
+        MeasureButtonRight = Button(root,image=bin3.image,command=lambda: [MeasureRight()],activebackground="red", justify=RIGHT)
+        MeasureButtonRight.pack(side=LEFT)
+
         # --- --- Input Box --- ---
         #joint1 = Label(root, text = "Joint 1 Position")
         #joint1.place(relx=0.75, rely=0.5 + 0.05)
@@ -382,8 +388,8 @@ def screenHome():
     calibrateButton=Button(root,text="CALIBRATE",font=("Times_New_Roman",75),command = lambda: [calibrate()],background="green",activebackground="red")
     calibrateButton.place(relx=.5,rely=.25,anchor= CENTER)
     
-    #motionControlButton=Button(root,text="GripPi Motion Control",font=("Times_New_Roman",25),command=screenMotionControl,background="green",activebackground="red")
-    #motionControlButton.place(relx=0.9,rely=.9,anchor= CENTER)
+    motionControlButton=Button(root,text="Object Measurements",font=("Times_New_Roman",25),command=screenMotionControl,background="green",activebackground="red")
+    motionControlButton.place(relx=0.8,rely=.95,anchor= CENTER)
     
     binsButton=Button(root, text="BINS", font=("Times_New_Roman",100), command = lambda: [isCalibrated()], background="green",activebackground="red")
     binsButton.place(relx=.5,rely=0.725,anchor= CENTER)
