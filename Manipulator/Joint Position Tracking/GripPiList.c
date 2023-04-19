@@ -1,0 +1,188 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct MyLinkedList{
+    int val;
+    int x;
+    int y;
+    struct MyLinkedList *next;
+} MyLinkedList;
+
+// --- Singly Linked list 
+MyLinkedList* myLinkedListCreate() {
+    MyLinkedList *head = malloc(sizeof(MyLinkedList)); 
+    head->val = 1001;
+    head->x = 0;
+    head->y = 0;
+    head->next = NULL;
+    return head;
+}
+
+// --- I should reqrite this to return the adress of the current node with the (x,y) values
+// --- Gets the value of the node at the index
+int myLinkedListGet(MyLinkedList* obj, int index) {
+    // No list
+    if(obj == NULL) return(-1);
+    // List exists, no nodes yet 
+    if(obj->next == NULL && obj->val == 1001) return(-1);
+    
+    int count = 0;
+    
+    while(obj != NULL){
+        if(count == index) return(obj->val);
+        obj = obj->next;
+        count++;
+    }
+    
+    return(-1);
+}
+
+void* myLinkedListGet(MyLinkedList* obj, int index) {
+    // No list
+    if(obj == NULL) return(-1);
+    // List exists, no nodes yet 
+    if(obj->next == NULL && obj->val == 1001) return(NULL);
+    
+    int count = 0;
+    
+    while(obj != NULL){
+        if(count == index) return(obj);
+        obj = obj->next;
+        count++;
+    }
+    
+    return(NULL);
+}
+
+
+
+
+
+
+// --- I don't know where or how the adress of the head node is stored
+// --- so, I'm just going to swap it.
+void myLinkedListAddAtHead(MyLinkedList* obj, int val) {
+    if(obj == NULL) return;
+    
+    if(obj->val == 1001){
+        obj->val = val;
+        return;
+    } 
+    
+    MyLinkedList *newNode = malloc(sizeof(MyLinkedList)); 
+
+    if(obj->next != NULL){
+        newNode->next = obj->next;
+    }
+    else{
+        newNode->next = NULL;     
+    }
+    
+    newNode->val = obj->val;
+    obj->next = newNode;
+    obj->val = val;
+}
+
+void myLinkedListAddAtTail(MyLinkedList* obj, int val) {
+    // There is no list
+    if(obj == NULL) return;
+    
+    // There is no head
+    if(obj->val == 1001){
+        obj->val = val;
+        return;
+    }
+    
+    MyLinkedList *newNode = malloc(sizeof(MyLinkedList));
+    newNode->val = val;
+    newNode->next = NULL;
+    void *last_node = NULL;
+
+    while(obj != NULL){
+        last_node = obj;
+        obj = obj->next;
+    }
+    
+    obj = last_node;
+    obj->next = newNode;
+}
+
+void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int val) {
+    // There is no list
+    if(obj == NULL) return;
+    
+    // Add at the head
+    if(index == 0) myLinkedListAddAtHead(obj, val);
+    if(index == 1 && obj->val == 1001) return;
+    MyLinkedList *newNode = malloc(sizeof(MyLinkedList));
+    newNode->val = val;
+    void *last_node = NULL;
+    int count = 0;
+    
+    while(obj != NULL){
+        count++;
+        last_node = obj;
+        obj = obj->next;
+        
+        if(count == index){
+            //swap nodes
+            newNode->next = obj;
+            obj = last_node;
+            obj->next = newNode;
+            return;
+        }
+    }
+}
+
+void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
+    // There is no list
+    if(obj == NULL) return;
+    
+    void *last_node = NULL, *kill_node = NULL;
+    int count = 0;
+    
+    // The head cannot be deleted because leetcode keeps the head address in a struct that is not
+    // acessible. This janky solution swaps the values of the next node to the head and then deletes       // it
+    if(index == 0){
+        if(obj->next != NULL){
+            obj->val =  obj->next->val;
+            obj->next = obj->next->next;
+            kill_node = obj->next;
+            // free(kill_node); breaks the program
+        }
+        else{
+            obj->val = 1001;
+        }
+        return;
+    }
+    
+    while(obj != NULL){
+        if(count == index){
+            //swap nodes
+            kill_node = obj;
+            obj = last_node;
+            obj->next = obj->next->next;
+            free(kill_node);
+            return;
+        }
+        count++;
+        last_node = obj;
+        obj = obj->next;
+    }
+}
+
+void myLinkedListFree(MyLinkedList* obj) {
+    if(obj == NULL) return;
+    
+    void *kill_node = NULL;
+    while(obj != NULL){
+        kill_node = obj;
+        obj = obj->next;
+        free(kill_node);
+    }
+}
+
+int main(){
+    printf("GripPi is the best");
+    return 0;
+}
