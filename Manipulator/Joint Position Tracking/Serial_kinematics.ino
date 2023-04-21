@@ -1,10 +1,11 @@
+#include <GripPi.h>
 #include <BasicLinearAlgebra.h>
 #include <ElementStorage.h>
 #include <Servo.h>
 #include <AccelStepper.h>
 #include <MultiStepper.h>
-#define PI 3.1415926535897932384626433832795 
-
+#define PI 3.14159
+/*
 //------Declarations------//
   // Program Constants
   //------base------//
@@ -58,7 +59,7 @@
     #define WRIST_ENA 47    //standard pin
     #define WRIST_PUL 46    //standard pin
     #define WRIST_DIR 45    //PWM pin
-    
+*/
 //------Global Variables------//
   Servo Servo_Grip;
   static long base_motor_position = 0;
@@ -77,6 +78,12 @@
   bool elbow_location_reached = 0;
   bool forarm_location_reached = 0;
   bool wrist_location_reached = 0;
+  int current_base_pos;
+  int current_shoulder_pos;
+  int current_elbow_pos;
+  int current_wrist_pos;
+
+
 
 using namespace BLA;
 //------limb angles in rad------//
@@ -85,13 +92,11 @@ using namespace BLA;
   float theta2 = 0; //
   float theta3 = 0; // 
 
-
 //------limb length in milimeters------//
   float a0 = 221; //base to shoulder
   float a1 = 221; //shoulder to elbow
   float a2 = 218; //elbow to wrist
   float a3 = 147; //wrist to gripper
-
 
 //------Position Declarations------//
 //temp inputs
@@ -107,7 +112,7 @@ using namespace BLA;
   AccelStepper BaseStepper(DRIVER_INTERFACE, BASE_PUL, BASE_DIR);
   AccelStepper ShoulderStepper(DRIVER_INTERFACE, SHOULDER_PUL, SHOULDER_DIR);
   AccelStepper ElbowStepper(DRIVER_INTERFACE, ELBOW_PUL, ELBOW_DIR);
-  AccelStepper ForarmStepper(DRIVER_INTERFACE, FORARM_PUL, FORARM_DIR);
+  AccelStepper ForarmStepper(DRIVER_INTERFACE, FOREARM_PUL, FOREARM_DIR);
   AccelStepper WristStepper(DRIVER_INTERFACE, WRIST_PUL, WRIST_DIR);
 //
 
@@ -120,6 +125,7 @@ using namespace BLA;
   float PCX = 0;
   float PCY = 0;
   float PCZ = 0;
+  float PCG = 130;
 
 boolean newData = false;
 //------ end of code------//
@@ -130,40 +136,52 @@ void setup() {
   //ThetaCalc();
   //MatrixMath();
   Serial.begin(9600);  // Initialize Native USB port
+  SerialUSB.begin(9600);
 
   driverInit();
-  WakeUp();
+  BaseStepper.enableOutputs();
+  ShoulderStepper.enableOutputs();
+  ElbowStepper.enableOutputs();
+  ForarmStepper.enableOutputs();
+  WristStepper.enableOutputs();
+  //WakeUp();
   //homeBaseAxis();
   //homeShoulderAxis();
   //homeElbowAxis();
   //homeForarmAxis();
-  //homeWristAxis();
 
   //----test code----//
-    Serial.println("This demo expects 3 pieces of data - an X, Y, and Z values");
-    Serial.println("Enter data in this style <X value, Y value, Z value>  ");
-    Serial.println();
+    SerialUSB.println("This demo expects 4 pieces of data - X, Y, Z and grip values");
+    SerialUSB.println("Enter data in this style <X value, Y value, Z value Grip Value (90 or 130)>  ");
+    SerialUSB.println();
 }
 
-void loop() { 
-//------test code------// 
+void loop() {
+  //------test code------// 
     recvWithStartEndMarkers();
     if (newData == true) {
         strcpy(tempChars, receivedChars);
             // this temporary copy is necessary to protect the original data
             // because strtok() used in parseData() replaces the commas with \0
         parseData();
-        showParsedData();
+        //showParsedData();
+        if(PCX=999){
+          
+        }
+
+        else{
            Pxd = PCX; 
            Pyd = PCY; 
            Pzd = PCZ;
+           Servo_Grip.write(PCG);
         ThetaCalc();
         ThetaConvert();
         
         newData = false;
+        }
     }
-//------End of test code------//
-//------loop for when the location has already been reached------//
+  //------End of test code------//
+  //------loop for when the location has already been reached------//
       BaseStepper.enableOutputs();
       ShoulderStepper.enableOutputs();
       ElbowStepper.enableOutputs();
@@ -185,14 +203,11 @@ void loop() {
       ElbowStepper.setAcceleration(ELBOW_ACCELERATION);
       ElbowStepper.run();
 
-
-
     //------Wrist Inputs------//
-
-      wristcalc();
       WristStepper.moveTo(wrist_steps);  //the pi will update this value wrist_steps
       WristStepper.setAcceleration(WRIST_ACCELERATION);
       WristStepper.run();
+
       
     //------checking for input changes//
       base_location_reached = BaseStepper.distanceToGo();
@@ -204,21 +219,21 @@ void loop() {
   //-------While loop to run while joints are moving------//
   while (base_location_reached != 0 || shoulder_location_reached != 0 || elbow_location_reached != 0 || wrist_location_reached != 0) {
     //once the inputs are recieved, this loop plays traveling to the location
-    BaseStepper.enableOutputs();
-    ShoulderStepper.enableOutputs();
-    ElbowStepper.enableOutputs();
-    ForarmStepper.enableOutputs();
-    WristStepper.enableOutputs();
-    base_location_reached = BaseStepper.distanceToGo();
-    BaseStepper.run();
-    shoulder_location_reached = ShoulderStepper.distanceToGo();
-    ShoulderStepper.run();
-    elbow_location_reached = ElbowStepper.distanceToGo();
-    ElbowStepper.run();
-    wrist_location_reached = WristStepper.distanceToGo();
-    WristStepper.run();
-  }
+      BaseStepper.enableOutputs();
+      ShoulderStepper.enableOutputs();
+      ElbowStepper.enableOutputs();
+      ForarmStepper.enableOutputs();
+      WristStepper.enableOutputs();
+      base_location_reached = BaseStepper.distanceToGo();
+      BaseStepper.run();
+      shoulder_location_reached = ShoulderStepper.distanceToGo();
+      ShoulderStepper.run();
+      elbow_location_reached = ElbowStepper.distanceToGo();
+      ElbowStepper.run();
+       wrist_location_reached = WristStepper.distanceToGo();
+      WristStepper.run();
 
+  }  
 }
 
 //------matrix math------// 
@@ -263,10 +278,11 @@ void MatrixMath(){
 
   Serial << "TOTAL: " << TOTAL << '\n';
 
+
 }
 
 void ThetaCalc(){
-//------calculating theta 0, theta 1, theta 2, and theta3------//
+  //------calculating theta 0, theta 1, theta 2, and theta3------//
   distance=sqrt(sq(Pzd)+sq(Pxd));   //calculate distance from Yaxis to Desired point 
   theta0=atan(Pzd/Pxd);             //calculate theta 0 to align axis with the distance 
   APx=distance-a3;                  //adjusted x axis 
@@ -279,7 +295,7 @@ void ThetaCalc(){
   theta1=-(PI/2-theta1); 
   theta2=-theta2; 
   theta3=-(PI/2+theta1+theta2); 
-/*  
+  /*  
   Serial.print("theta0: ");
   Serial.println(theta0);
   Serial.print("theta1: ");
@@ -307,281 +323,261 @@ void ThetaConvert(){//convert the new thetas into steps the system looks for
   */
 
 }
+//------calibrations------//
+  void WakeUp(void){
+      BaseStepper.enableOutputs();
+      ShoulderStepper.enableOutputs();
+      ElbowStepper.enableOutputs();
+      ForarmStepper.enableOutputs();
+      WristStepper.enableOutputs();
+      
+      ShoulderStepper.setAcceleration(200);
+      ShoulderStepper.runToNewPosition(-2000); //test //shoulder moves back about 80-90 degrees
+      //BaseStepper.setAcceleration(300);
+      //BaseStepper.runToNewPosition(-4000); //test
+      ElbowStepper.setAcceleration(800);
+      ElbowStepper.runToNewPosition(-9000); //test //elbow moves back about 90 degrees
 
-void WakeUp(void){
-    BaseStepper.enableOutputs();
-    ShoulderStepper.enableOutputs();
-    ElbowStepper.enableOutputs();
-    ForarmStepper.enableOutputs();
-    WristStepper.enableOutputs();
-    
-    ShoulderStepper.setAcceleration(200);
-    ShoulderStepper.runToNewPosition(-2000); //test //shoulder moves back about 80-90 degrees
+      homeShoulderAxis();
+      homeElbowAxis();
+      homeWristAxis();
+      homeBaseAxis();
+
+  }
+
+  void ReCalibrate(void){
+    HomeWristAxis();
+    homeElbowAxis();    
+    homeBaseAxis();
     //BaseStepper.setAcceleration(300);
     //BaseStepper.runToNewPosition(-4000); //test
-    ElbowStepper.setAcceleration(800);
-    ElbowStepper.runToNewPosition(-9000); //test //elbow moves back about 90 degrees
-
     homeShoulderAxis();
-    homeElbowAxis();
-    homeWristAxis();
-    homeBaseAxis();
-
-}
-/*----- Base Axis Calibration------*/
-void homeBaseAxis(void) {
-  bool base_home_set = false;
-  int base_limit_reached = 0;
-
-  while (!base_home_set) {
-
-    while (!base_limit_reached) {  //motor rotates CCW
-      BaseStepper.setSpeed(500);
-      BaseStepper.runSpeed();
-      base_limit_reached = digitalRead(BASE_LIMIT);  //this pin stays low untill limit switch is hit
-    }
-
-    while (base_limit_reached) {  //this runs when the limit switch is being held
-      BaseStepper.setSpeed(-100);
-      BaseStepper.runSpeed();
-      base_limit_reached = digitalRead(BASE_LIMIT);
-    }
-
-    BaseStepper.setCurrentPosition(base_motor_position);  //motor is set to zero and motor speed is zero
-    BaseStepper.setAcceleration(300);
-    BaseStepper.runToNewPosition(-6000);  //-6000 steps ~135deg from the limit switch gets us very close to the zero point on the arm
-    //~44.44 steps per degree
-    BaseStepper.setCurrentPosition(base_motor_position);  //zero position is when the two arrows are lined up
-    base_home_set = true;
-  }
-}
-
-/*----- Shoulder Axis Calibration------*/
-void homeShoulderAxis(void) {
-  bool shoulder_home_set = false;
-  int shoulder_limit_reached = 0;
-
-  while (!shoulder_home_set) {
-
-    while (!shoulder_limit_reached) {  //Joint rotates forwards
-      ShoulderStepper.setSpeed(200);
-      ShoulderStepper.runSpeed();
-      shoulder_limit_reached = !digitalRead(SHOULDER_LIMIT);  //this pin stays low untill limit switch is hit
-    }
-
-    while (shoulder_limit_reached) {  //this runs when the limit switch is being held
-      ShoulderStepper.setSpeed(-100);
-      ShoulderStepper.runSpeed();
-      shoulder_limit_reached = !digitalRead(SHOULDER_LIMIT);
-    }
-
-    ShoulderStepper.setCurrentPosition(shoulder_motor_position);  //motor is set to zero and motor speed is zero
-    ShoulderStepper.setAcceleration(200);
-    ShoulderStepper.runToNewPosition(-2200);//+ = forwards, - = backwards 2200 steps ~90 degrees
-    //~24.44 steps per degree
-    ShoulderStepper.setCurrentPosition(shoulder_motor_position);  //zero position is when the two arrows are lined up
-
-    shoulder_home_set = true;
-  }
-}
-
-//------Elbow Axis Calibration------//
-void homeElbowAxis(void) {
-  bool elbow_home_set = false;
-  int elbow_limit_reached = 0;
-
-  while (!elbow_home_set) {
-
-    while (!elbow_limit_reached) {
-
-      ElbowStepper.setSpeed(1500);  //Arm rotates forwards
-      ElbowStepper.runSpeed();
-      elbow_limit_reached = !digitalRead(ELBOW_LIMIT);  //this pin stays low untill limit switch is hit
-    }
-
-    while (elbow_limit_reached) {  //this runs when the limit switch is being held
-      ElbowStepper.setSpeed(-1000);
-      ElbowStepper.runSpeed();
-      elbow_limit_reached = !digitalRead(ELBOW_LIMIT);
-    }
-
-    ElbowStepper.setCurrentPosition(elbow_motor_position);  //motor is set to zero and motor speed is zero
-    ElbowStepper.setAcceleration(800);
-    ElbowStepper.runToNewPosition(-9000);//+ = forwards, - = backwards 9000 ~90deg
-
-    ElbowStepper.setCurrentPosition(elbow_motor_position);  //zero position is when the two arrows are lined up
-
-    elbow_home_set = true;
-  }
-}
-
-//------Calibration Sequence for the Wrist------//
-void homeWristAxis(void) {
-  bool wrist_home_set = false;
-  int wrist_limit_reached = 0;
-
-
-  while (!wrist_home_set) {
-
-    while (!wrist_limit_reached) {
-
-      WristStepper.setSpeed(-300);  //Arm rotates forwards
-      WristStepper.runSpeed();
-      wrist_limit_reached = !digitalRead(WRIST_LIMIT);  //this pin stays low untill limit switch is hit
-    }
-
-    while (wrist_limit_reached) {  //this runs when the limit switch is being held
-      WristStepper.setSpeed(100);
-      WristStepper.runSpeed();
-      wrist_limit_reached = !digitalRead(WRIST_LIMIT);
-    }
-
-    WristStepper.setCurrentPosition(wrist_motor_position);  //motor is set to zero and motor speed is zero
-    WristStepper.setAcceleration(300);
-    WristStepper.runToNewPosition(1800);//- = forwards, + = backwards 1750 steps ~90 degrees
-
-    WristStepper.setCurrentPosition(wrist_motor_position);  //zero position is when the two arrows are lined up
-    wrist_home_set = true;
-
     //BaseStepper.setAcceleration(300);
-    //BaseStepper.runToNewPosition(4000); 
-    //BaseStepper.setCurrentPosition(base_motor_position); //motor is set to zero and motor speed is zero 
+    //BaseStepper.runToNewPosition(0);
     
   }
-}
-//------Solo Calibration Sequence for the Wrist------//
-void homeWristAxis2(void) {
-  bool wrist_home_set = false;
-  int wrist_limit_reached = 0;
 
+  /*----- Base Axis Calibration------*/
+  void homeBaseAxis(void) {
+    bool base_home_set = false;
+    int base_limit_reached = 0;
 
-  while (!wrist_home_set) {
+    while (!base_home_set) {
 
-    while (!wrist_limit_reached) {
+      while (!base_limit_reached) {  //motor rotates CCW
+        BaseStepper.setSpeed(500);
+        BaseStepper.runSpeed();
+        base_limit_reached = digitalRead(BASE_LIMIT);  //this pin stays low untill limit switch is hit
+      }
 
-      WristStepper.setSpeed(-300);  //Arm rotates forwards
-      WristStepper.runSpeed();
-      wrist_limit_reached = !digitalRead(WRIST_LIMIT);  //this pin stays low untill limit switch is hit
+      while (base_limit_reached) {  //this runs when the limit switch is being held
+        BaseStepper.setSpeed(-100);
+        BaseStepper.runSpeed();
+        base_limit_reached = digitalRead(BASE_LIMIT);
+      }
+
+      BaseStepper.setCurrentPosition(base_motor_position);  //motor is set to zero and motor speed is zero
+      BaseStepper.setAcceleration(300);
+      BaseStepper.runToNewPosition(-6000);  //-6000 steps ~135deg from the limit switch gets us very close to the zero point on the arm
+      //~44.44 steps per degree     //-4000~90deg
+      BaseStepper.setCurrentPosition(base_motor_position);  //zero position is when the two arrows are lined up
+      base_home_set = true;
     }
-
-    while (wrist_limit_reached) {  //this runs when the limit switch is being held
-      WristStepper.setSpeed(100);
-      WristStepper.runSpeed();
-      wrist_limit_reached = !digitalRead(WRIST_LIMIT);
-    }
-
-    WristStepper.setCurrentPosition(wrist_motor_position);  //motor is set to zero and motor speed is zero
-    WristStepper.setAcceleration(300);
-    WristStepper.runToNewPosition(1750);//- = forwards, + = backwards 1750 steps ~90 degrees
-
-    WristStepper.setCurrentPosition(wrist_motor_position);  //zero position is when the two arrows are lined up
-    wrist_home_set = true;
-    
   }
-}
+
+  /*----- Shoulder Axis Calibration------*/
+  void homeShoulderAxis(void) {
+    bool shoulder_home_set = false;
+    int shoulder_limit_reached = 0;
+
+    while (!shoulder_home_set) {
+
+      while (!shoulder_limit_reached) {  //Joint rotates forwards
+        ShoulderStepper.setSpeed(200);
+        ShoulderStepper.runSpeed();
+        shoulder_limit_reached = !digitalRead(SHOULDER_LIMIT);  //this pin stays low untill limit switch is hit
+      }
+
+      while (shoulder_limit_reached) {  //this runs when the limit switch is being held
+        ShoulderStepper.setSpeed(-100);
+        ShoulderStepper.runSpeed();
+        shoulder_limit_reached = !digitalRead(SHOULDER_LIMIT);
+      }
+
+      ShoulderStepper.setCurrentPosition(shoulder_motor_position);  //motor is set to zero and motor speed is zero
+      ShoulderStepper.setAcceleration(200);
+      ShoulderStepper.runToNewPosition(-2200);//+ = forwards, - = backwards 2200 steps ~90 degrees
+      //~24.44 steps per degree
+      ShoulderStepper.setCurrentPosition(shoulder_motor_position);  //zero position is when the two arrows are lined up
+
+      shoulder_home_set = true;
+    }
+  }
+
+  //------Elbow Axis Calibration------//
+  void homeElbowAxis(void) {
+    bool elbow_home_set = false;
+    int elbow_limit_reached = 0;
+
+    while (!elbow_home_set) {
+
+      while (!elbow_limit_reached) {
+
+        ElbowStepper.setSpeed(1500);  //Arm rotates forwards
+        ElbowStepper.runSpeed();
+        elbow_limit_reached = !digitalRead(ELBOW_LIMIT);  //this pin stays low untill limit switch is hit
+      }
+
+      while (elbow_limit_reached) {  //this runs when the limit switch is being held
+        ElbowStepper.setSpeed(-1000);
+        ElbowStepper.runSpeed();
+        elbow_limit_reached = !digitalRead(ELBOW_LIMIT);
+      }
+
+      ElbowStepper.setCurrentPosition(elbow_motor_position);  //motor is set to zero and motor speed is zero
+      ElbowStepper.setAcceleration(800);
+      ElbowStepper.runToNewPosition(-8400);//+ = forwards, - = backwards 9000 ~90deg
+
+      ElbowStepper.setCurrentPosition(elbow_motor_position);  //zero position is when the two arrows are lined up
+
+      elbow_home_set = true;
+    }
+  }
+
+  //------Calibration Sequence for the Wrist------//
+  void homeWristAxis(void) {
+    bool wrist_home_set = false;
+    int wrist_limit_reached = 0;
+
+
+    while (!wrist_home_set) {
+
+      while (!wrist_limit_reached) {
+
+        WristStepper.setSpeed(-300);  //Arm rotates forwards
+        WristStepper.runSpeed();
+        wrist_limit_reached = !digitalRead(WRIST_LIMIT);  //this pin stays low untill limit switch is hit
+      }
+
+      while (wrist_limit_reached) {  //this runs when the limit switch is being held
+        WristStepper.setSpeed(100);
+        WristStepper.runSpeed();
+        wrist_limit_reached = !digitalRead(WRIST_LIMIT);
+      }
+
+      WristStepper.setCurrentPosition(wrist_motor_position);  //motor is set to zero and motor speed is zero
+      WristStepper.setAcceleration(300);
+      WristStepper.runToNewPosition(1800);//- = forwards, + = backwards 1750 steps ~90 degrees
+
+      WristStepper.setCurrentPosition(wrist_motor_position);  //zero position is when the two arrows are lined up
+      wrist_home_set = true;
+      
+    }
+  }
+
 /*----- AccelStepper Drivier Init ------*/
-void driverInit(void) {
-  // Base
-  pinMode(BASE_LIMIT, INPUT);
-  BaseStepper.setMaxSpeed(BASE_MAX_SPEED);
-  BaseStepper.setEnablePin(BASE_ENA);
-  BaseStepper.setPinsInverted(false, false, true);
-  BaseStepper.disableOutputs();
+  void driverInit(void) {
+    // Base
+    pinMode(BASE_LIMIT, INPUT);
+    BaseStepper.setMaxSpeed(BASE_MAX_SPEED);
+    BaseStepper.setEnablePin(BASE_ENA);
+    BaseStepper.setPinsInverted(false, false, true);
+    BaseStepper.disableOutputs();
 
-  // Shoulder
-  pinMode(SHOULDER_LIMIT, INPUT);
-  ShoulderStepper.setMaxSpeed(SHOULDER_MAX_SPEED);
-  ShoulderStepper.setEnablePin(SHOULDER_ENA);
-  ShoulderStepper.setPinsInverted(false, false, true);
-  ShoulderStepper.disableOutputs();
+    // Shoulder
+    pinMode(SHOULDER_LIMIT, INPUT);
+    ShoulderStepper.setMaxSpeed(SHOULDER_MAX_SPEED);
+    ShoulderStepper.setEnablePin(SHOULDER_ENA);
+    ShoulderStepper.setPinsInverted(false, false, true);
+    ShoulderStepper.disableOutputs();
 
-  // Elbow
-  pinMode(ELBOW_LIMIT, INPUT);
-  ElbowStepper.setMaxSpeed(ELBOW_MAX_SPEED);
-  ElbowStepper.setEnablePin(ELBOW_ENA);
-  ElbowStepper.setPinsInverted(false, false, true);
-  //ElbowStepper.disableOutputs();
+    // Elbow
+    pinMode(ELBOW_LIMIT, INPUT);
+    ElbowStepper.setMaxSpeed(ELBOW_MAX_SPEED);
+    ElbowStepper.setEnablePin(ELBOW_ENA);
+    ElbowStepper.setPinsInverted(false, false, true);
+    //ElbowStepper.disableOutputs();
 
-  // Forarm
-  pinMode(FORARM_LIMIT, INPUT);
-  ForarmStepper.setMaxSpeed(FORARM_MAX_SPEED);
-  ForarmStepper.setEnablePin(FORARM_ENA);
-  ForarmStepper.setPinsInverted(false, false, true);
-  //ForarmStepper.disableOutputs();
+    // Forarm
+    pinMode(FOREARM_LIMIT, INPUT);
+    ForarmStepper.setMaxSpeed(FOREARM_MAX_SPEED);
+    ForarmStepper.setEnablePin(FOREARM_ENA);
+    ForarmStepper.setPinsInverted(false, false, true);
+    //ForarmStepper.disableOutputs();
 
-  //Wrist
-  pinMode(WRIST_LIMIT, INPUT);
-  WristStepper.setMaxSpeed(WRIST_MAX_SPEED);
-  WristStepper.setEnablePin(WRIST_ENA);
-  WristStepper.setPinsInverted(false, false, true);
-  //WristStepper.disableOutputs();
+    //Wrist
+    pinMode(WRIST_LIMIT, INPUT);
+    WristStepper.setMaxSpeed(WRIST_MAX_SPEED);
+    WristStepper.setEnablePin(WRIST_ENA);
+    WristStepper.setPinsInverted(false, false, true);
+    //WristStepper.disableOutputs();
 
-  Servo_Grip.attach(53);
-  Servo_Grip.write(90);
+    Servo_Grip.attach(53);
+    Servo_Grip.write(130);
 
-}
+  }
+//------serial code------//
+  void recvWithStartEndMarkers() {
+      static boolean recvInProgress = false;
+      static byte ndx = 0;
+      char startMarker = '<';
+      char endMarker = '>';
+      char rc;
 
-void recvWithStartEndMarkers() {
-    static boolean recvInProgress = false;
-    static byte ndx = 0;
-    char startMarker = '<';
-    char endMarker = '>';
-    char rc;
+      while (SerialUSB.available() > 0 && newData == false) {
+          rc = SerialUSB.read();
 
-    while (Serial.available() > 0 && newData == false) {
-        rc = Serial.read();
+          if (recvInProgress == true) {
+              if (rc != endMarker) {
+                  receivedChars[ndx] = rc;
+                  ndx++;
+                  if (ndx >= numChars) {
+                      ndx = numChars - 1;
+                  }
+              }
+              else {
+                  receivedChars[ndx] = '\0'; // terminate the string
+                  recvInProgress = false;
+                  ndx = 0;
+                  newData = true;
+              }
+          }
 
-        if (recvInProgress == true) {
-            if (rc != endMarker) {
-                receivedChars[ndx] = rc;
-                ndx++;
-                if (ndx >= numChars) {
-                    ndx = numChars - 1;
-                }
-            }
-            else {
-                receivedChars[ndx] = '\0'; // terminate the string
-                recvInProgress = false;
-                ndx = 0;
-                newData = true;
-            }
-        }
+          else if (rc == startMarker) {
+              recvInProgress = true;
+          }
+      }
+  }
 
-        else if (rc == startMarker) {
-            recvInProgress = true;
-        }
-    }
-}
+  //============
 
-//============
+  void parseData() {      // split the data into its parts
 
-void parseData() {      // split the data into its parts
+      char * strtokIndx; // this is used by strtok() as an index
 
-    char * strtokIndx; // this is used by strtok() as an index
+      strtokIndx = strtok(tempChars,",");      // get the first part - the string
+      PCX = atof(strtokIndx); // copy it to messageFromPC
+  
+      strtokIndx = strtok(NULL, ","); // this continues where the previous call left off
+      PCY = atof(strtokIndx);     // convert this part to an integer
 
-    strtokIndx = strtok(tempChars,",");      // get the first part - the string
-    PCX = atof(strtokIndx); // copy it to messageFromPC
- 
-    strtokIndx = strtok(NULL, ","); // this continues where the previous call left off
-    PCY = atof(strtokIndx);     // convert this part to an integer
+      strtokIndx = strtok(NULL, ",");
+      PCZ = atof(strtokIndx);     // convert this part to a float
 
-    strtokIndx = strtok(NULL, ",");
-    PCZ = atof(strtokIndx);     // convert this part to a float
+      strtokIndx= strtok(NULL, ",");
+      PCG = atof(strtokIndx);
+  }
 
-}
+  //============
 
-//============
-
-void showParsedData() {
-    Serial.print("X ");
-    Serial.println(PCX);
-    Serial.print("Y ");
-    Serial.println(PCY);
-    Serial.print("Z ");
-    Serial.println(PCZ);
-}
-
-void wristcalc(){
-  wrist_steps=-19.44*(90-shoulder_steps/24.4-elbow_steps/100)
-
-}
+  void showParsedData() {
+      SerialUSB.print("X ");
+      SerialUSB.println(PCX);
+      SerialUSB.print("Y ");
+      SerialUSB.println(PCY);
+      SerialUSB.print("Z ");
+      SerialUSB.println(PCZ);
+      SerialUSB.print("G ");
+      SerialUSB.println(PCG);
+      
+  }
