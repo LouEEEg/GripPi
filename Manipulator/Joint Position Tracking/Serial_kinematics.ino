@@ -165,8 +165,11 @@ void loop() {
             // because strtok() used in parseData() replaces the commas with \0
         parseData();
         //showParsedData();
-        if(PCX=999){
-          
+        if(PCX=999){ 
+          WakeUp();
+        }
+        else if(PCX=998){
+          ReCalibrate();
         }
 
         else{
@@ -349,11 +352,11 @@ void ThetaConvert(){//convert the new thetas into steps the system looks for
     HomeWristAxis();
     homeElbowAxis();    
     homeBaseAxis();
-    //BaseStepper.setAcceleration(300);
-    //BaseStepper.runToNewPosition(-4000); //test
+    BaseStepper.setAcceleration(300);
+    BaseStepper.runToNewPosition(-4000); //test
     homeShoulderAxis();
-    //BaseStepper.setAcceleration(300);
-    //BaseStepper.runToNewPosition(0);
+    BaseStepper.setAcceleration(300);
+    BaseStepper.runToNewPosition(0);
     
   }
 
