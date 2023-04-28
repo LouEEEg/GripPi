@@ -418,6 +418,7 @@ void RxGoalFromSerial(SerialInput GripPi_Serial, Manipulator GripPi) {
     GripPi.goal.x = GripPi_Serial.Rx_x; 
     GripPi.goal.y = GripPi_Serial.Rx_y; 
     GripPi.goal.z = GripPi_Serial.Rx_z;
+    GripPi.goal.g = GripPi_Serial.Rx_g;
     
     GripPi_Serial.new_data = false;
   }
@@ -434,6 +435,10 @@ void parseData(SerialInput GripPi_serial) {               // split the data into
 
   strtokIndx = strtok(NULL, ",");
   GripPi_serial.Rx_z = atof(strtokIndx);                  // convert this part to a float
+  
+  strtokIndx = strtok(NULL, ",");
+  GripPi_serial.Rx_g = atof(strtokIndx);                  // convert this part to a float
+  
 }
 
 void printParsedData(SerialInput GripPi_serial) {
