@@ -111,12 +111,14 @@ typedef struct{
     float x = 0;
     float y = 0;
     float z = 0;
+    float g = 0;
   }goal;
 
   struct{
     float x = 0;
     float y = 0;
     float z = 0;
+    float g = 0; 
   }pose;
 }Manipulator;
 
@@ -126,5 +128,6 @@ typedef struct{
   float Rx_x = 0.0;
   float Rx_y = 0.0;
   float Rx_z = 0.0;
+  float Rx_g = 0.0;
   bool new_data = false;
 }SerialInput;
