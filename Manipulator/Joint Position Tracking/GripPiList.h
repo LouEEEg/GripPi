@@ -55,7 +55,7 @@ void myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, i
         return;
     } 
     
-    MyLinkedList *newNode = malloc(sizeof(MyLinkedList)); 
+    MyLinkedList *newNode = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
 
     if(obj->next != NULL){
         newNode->next = obj->next;
@@ -87,7 +87,7 @@ void myLinkedListAddAtTail(MyLinkedList* obj, int x_val, int y_val, int z_val, i
         return;
     }
     
-    MyLinkedList *newNode = malloc(sizeof(MyLinkedList));
+    MyLinkedList *newNode = (MyLinkedList*)malloc(sizeof(MyLinkedList));
     newNode->x = x_val;
     newNode->y = y_val;
     newNode->z = z_val;
@@ -116,7 +116,7 @@ void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int x_val, int y_val, 
     }
 
     if(index == 1 && obj->val == 1001) return;
-    MyLinkedList *newNode = malloc(sizeof(MyLinkedList));
+    MyLinkedList *newNode = (MyLinkedList*)malloc(sizeof(MyLinkedList));
     newNode->x = x_val;
     newNode->y = y_val;
     newNode->z = z_val;
