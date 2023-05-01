@@ -12,7 +12,7 @@ typedef struct MyLinkedList{
 
 // --- Singly Linked list 
 MyLinkedList* myLinkedListCreate(void) {
-    MyLinkedList *head = malloc(sizeof(MyLinkedList)); 
+    MyLinkedList *head = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
     head->val = 1001;
     head->x = 0;
     head->y = 0;
@@ -21,6 +21,7 @@ MyLinkedList* myLinkedListCreate(void) {
     head->next = NULL;
     return head;
 }
+
 /*
 void* myLinkedListGet(MyLinkedList* obj, int index) {
     // Returns the adress to the indexed node.
@@ -41,9 +42,8 @@ void* myLinkedListGet(MyLinkedList* obj, int index) {
 */
 // --- I don't know where or how the adress of the head node is stored
 // --- so, I'm just going to swap it.
-void* myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, int gripper_val) {
-    void *temp;
-    if(obj == NULL) return NULL;
+void myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, int gripper_val) {
+    if(obj == NULL) return;
     
     if(obj->val == 1001){
         // There is no head
@@ -52,8 +52,7 @@ void* myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, 
         obj->y = y_val;
         obj->z = z_val;
         obj->gripper = gripper_val;
-        temp = obj;
-        return temp;
+        return;
     } 
     
     MyLinkedList *newNode = malloc(sizeof(MyLinkedList)); 
@@ -70,9 +69,7 @@ void* myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, 
     newNode->z = z_val;
     newNode->gripper = gripper_val;
     newNode->next = obj;
-    temp = newNode;
-
-    return temp;
+    return;
 
 }
 
