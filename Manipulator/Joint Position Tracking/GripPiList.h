@@ -21,7 +21,7 @@ MyLinkedList* myLinkedListCreate(void) {
     head->next = NULL;
     return head;
 }
-
+/*
 void* myLinkedListGet(MyLinkedList* obj, int index) {
     // Returns the adress to the indexed node.
     // No list
@@ -38,10 +38,11 @@ void* myLinkedListGet(MyLinkedList* obj, int index) {
     
     return(NULL);
 }
-
+*/
 // --- I don't know where or how the adress of the head node is stored
 // --- so, I'm just going to swap it.
 void* myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, int gripper_val) {
+    void *temp;
     if(obj == NULL) return NULL;
     
     if(obj->val == 1001){
@@ -51,7 +52,8 @@ void* myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, 
         obj->y = y_val;
         obj->z = z_val;
         obj->gripper = gripper_val;
-        return obj;
+        temp = obj;
+        return temp;
     } 
     
     MyLinkedList *newNode = malloc(sizeof(MyLinkedList)); 
@@ -68,8 +70,9 @@ void* myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, 
     newNode->z = z_val;
     newNode->gripper = gripper_val;
     newNode->next = obj;
+    temp = newNode;
 
-    return newNode;
+    return temp;
 
 }
 
