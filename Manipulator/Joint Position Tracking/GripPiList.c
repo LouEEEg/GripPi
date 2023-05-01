@@ -4,47 +4,32 @@
 typedef struct MyLinkedList{
     int val;
     int x;
-    int y;
+    int y; 
+    int z;
+    int gripper;
     struct MyLinkedList *next;
 } MyLinkedList;
 
 // --- Singly Linked list 
-MyLinkedList* myLinkedListCreate() {
+MyLinkedList* myLinkedListCreate(void) {
     MyLinkedList *head = malloc(sizeof(MyLinkedList)); 
     head->val = 1001;
     head->x = 0;
     head->y = 0;
+    head->z = 0;
+    head->gripper = 130;
     head->next = NULL;
     return head;
 }
 
-// --- I should reqrite this to return the adress of the current node with the (x,y) values
-// --- Gets the value of the node at the index
-int myLinkedListGet(MyLinkedList* obj, int index) {
-    // No list
-    if(obj == NULL) return(-1);
-    // List exists, no nodes yet 
-    if(obj->next == NULL && obj->val == 1001) return(-1);
-    
-    int count = 0;
-    
-    while(obj != NULL){
-        if(count == index) return(obj->val);
-        obj = obj->next;
-        count++;
-    }
-    
-    return(-1);
-}
-
 void* myLinkedListGet(MyLinkedList* obj, int index) {
+    // Returns the adress to the indexed node.
     // No list
-    if(obj == NULL) return(-1);
+    if(obj == NULL) return(NULL);
     // List exists, no nodes yet 
     if(obj->next == NULL && obj->val == 1001) return(NULL);
     
     int count = 0;
-    
     while(obj != NULL){
         if(count == index) return(obj);
         obj = obj->next;
@@ -54,19 +39,19 @@ void* myLinkedListGet(MyLinkedList* obj, int index) {
     return(NULL);
 }
 
-
-
-
-
-
 // --- I don't know where or how the adress of the head node is stored
 // --- so, I'm just going to swap it.
-void myLinkedListAddAtHead(MyLinkedList* obj, int val) {
-    if(obj == NULL) return;
+void* myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, int gripper_val) {
+    if(obj == NULL) return NULL;
     
     if(obj->val == 1001){
-        obj->val = val;
-        return;
+        // There is no head
+        obj->val = 0;
+        obj->x = x_val;
+        obj->y = y_val;
+        obj->z = z_val;
+        obj->gripper = gripper_val;
+        return obj;
     } 
     
     MyLinkedList *newNode = malloc(sizeof(MyLinkedList)); 
@@ -78,24 +63,37 @@ void myLinkedListAddAtHead(MyLinkedList* obj, int val) {
         newNode->next = NULL;     
     }
     
-    newNode->val = obj->val;
-    obj->next = newNode;
-    obj->val = val;
+    newNode->x = x_val;
+    newNode->y = y_val;
+    newNode->z = z_val;
+    newNode->gripper = gripper_val;
+    newNode->next = obj;
+
+    return newNode;
+
 }
 
-void myLinkedListAddAtTail(MyLinkedList* obj, int val) {
+void myLinkedListAddAtTail(MyLinkedList* obj, int x_val, int y_val, int z_val, int gripper_val) {
     // There is no list
     if(obj == NULL) return;
     
     // There is no head
     if(obj->val == 1001){
-        obj->val = val;
+        obj->val = 0;
+        obj->x = x_val;
+        obj->y = y_val;
+        obj->z = z_val;
+        obj->gripper = gripper_val;
         return;
     }
     
     MyLinkedList *newNode = malloc(sizeof(MyLinkedList));
-    newNode->val = val;
+    newNode->x = x_val;
+    newNode->y = y_val;
+    newNode->z = z_val;
+    newNode->gripper = gripper_val;
     newNode->next = NULL;
+    
     void *last_node = NULL;
 
     while(obj != NULL){
@@ -107,15 +105,23 @@ void myLinkedListAddAtTail(MyLinkedList* obj, int val) {
     obj->next = newNode;
 }
 
-void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int val) {
+void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int x_val, int y_val, int z_val, int gripper_val) {
     // There is no list
     if(obj == NULL) return;
     
     // Add at the head
-    if(index == 0) myLinkedListAddAtHead(obj, val);
+    if(index == 0){
+        myLinkedListAddAtHead(obj, x_val, y_val, z_val, gripper_val);
+        return;
+    }
+
     if(index == 1 && obj->val == 1001) return;
     MyLinkedList *newNode = malloc(sizeof(MyLinkedList));
-    newNode->val = val;
+    newNode->x = x_val;
+    newNode->y = y_val;
+    newNode->z = z_val;
+    newNode->gripper = gripper_val;
+
     void *last_node = NULL;
     int count = 0;
     
@@ -173,7 +179,7 @@ void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
 
 void myLinkedListFree(MyLinkedList* obj) {
     if(obj == NULL) return;
-    
+
     void *kill_node = NULL;
     while(obj != NULL){
         kill_node = obj;
@@ -182,7 +188,15 @@ void myLinkedListFree(MyLinkedList* obj) {
     }
 }
 
-int main(){
-    printf("GripPi is the best");
-    return 0;
+void myLinkedListPrint(MyLinkedList *obj){
+    int index = 0;
+    while(obj != NULL){
+        printf("Waypoint #%i \n", index);
+        printf("%i \n", obj->x);
+        printf("%i \n", obj->y);
+        printf("%i \n", obj->z);
+        printf("%i \n \n", obj->gripper);
+        index++;
+        obj = obj->next;
+    }
 }
