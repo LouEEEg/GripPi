@@ -94,7 +94,9 @@ void myLinkedListAddAtTail(MyLinkedList* obj, int x_val, int y_val, int z_val, i
     newNode->gripper = gripper_val;
     newNode->next = NULL;
     
-    void *last_node = NULL;
+    MyLinkedList *last_node = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
+
+    //void *last_node = NULL;
 
     while(obj != NULL){
         last_node = obj;
@@ -103,6 +105,7 @@ void myLinkedListAddAtTail(MyLinkedList* obj, int x_val, int y_val, int z_val, i
     
     obj = last_node;
     obj->next = newNode;
+    free(last_node);
 }
 
 void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int x_val, int y_val, int z_val, int gripper_val) {
@@ -122,7 +125,8 @@ void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int x_val, int y_val, 
     newNode->z = z_val;
     newNode->gripper = gripper_val;
 
-    void *last_node = NULL;
+    MyLinkedList *last_node = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
+    //void *last_node = NULL;
     int count = 0;
     
     while(obj != NULL){
@@ -135,6 +139,7 @@ void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int x_val, int y_val, 
             newNode->next = obj;
             obj = last_node;
             obj->next = newNode;
+            free(last_node);
             return;
         }
     }
@@ -143,8 +148,10 @@ void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int x_val, int y_val, 
 void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
     // There is no list
     if(obj == NULL) return;
-    
-    void *last_node = NULL, *kill_node = NULL;
+    MyLinkedList *last_node = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
+    MyLinkedList *kill_node = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
+
+    // void *last_node = NULL, *kill_node = NULL;
     int count = 0;
     
     // The head cannot be deleted because leetcode keeps the head address in a struct that is not
@@ -159,6 +166,8 @@ void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
         else{
             obj->val = 1001;
         }
+        free(kill_node);
+        free(last_node);
         return;
     }
     
@@ -180,7 +189,9 @@ void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
 void myLinkedListFree(MyLinkedList* obj) {
     if(obj == NULL) return;
 
-    void *kill_node = NULL;
+    //void *kill_node = NULL;
+    MyLinkedList *kill_node = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
+
     while(obj != NULL){
         kill_node = obj;
         obj = obj->next;
