@@ -3,9 +3,9 @@
 
 typedef struct MyLinkedList{
     int val;
-    int x;
-    int y; 
-    int z;
+    float x;
+    float y; 
+    float z;
     int gripper;
     struct MyLinkedList *next;
 } MyLinkedList;
