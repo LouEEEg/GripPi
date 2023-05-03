@@ -55,7 +55,7 @@ void myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, i
         return;
     } 
     
-    MyLinkedList *newNode = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
+    MyLinkedList *newNode;// = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
 
     if(obj->next != NULL){
         newNode->next = obj->next;
