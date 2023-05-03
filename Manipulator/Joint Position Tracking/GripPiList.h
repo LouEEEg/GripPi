@@ -6,7 +6,7 @@ typedef struct MyLinkedList{
     float x;
     float y; 
     float z;
-    int gripper;
+    int gripper; 
     struct MyLinkedList *next;
 } MyLinkedList;
 
@@ -40,6 +40,7 @@ void* myLinkedListGet(MyLinkedList* obj, int index) {
     return(NULL);
 }
 */
+
 // --- I don't know where or how the adress of the head node is stored
 // --- so, I'm just going to swap it.
 void myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, int gripper_val) {
@@ -55,7 +56,7 @@ void myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, i
         return;
     } 
     
-    MyLinkedList *newNode = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
+    MyLinkedList *newNode;//  = malloc(sizeof(MyLinkedList)); 
 
     if(obj->next != NULL){
         newNode->next = obj->next;
@@ -70,7 +71,6 @@ void myLinkedListAddAtHead(MyLinkedList* obj, int x_val, int y_val, int z_val, i
     newNode->gripper = gripper_val;
     newNode->next = obj;
     return;
-
 }
 
 void myLinkedListAddAtTail(MyLinkedList* obj, int x_val, int y_val, int z_val, int gripper_val) {
@@ -87,25 +87,25 @@ void myLinkedListAddAtTail(MyLinkedList* obj, int x_val, int y_val, int z_val, i
         return;
     }
     
+    //MyLinkedList *newNode = malloc(sizeof(MyLinkedList));
     MyLinkedList *newNode = myLinkedListCreate();
     newNode->x = x_val;
     newNode->y = y_val;
     newNode->z = z_val;
     newNode->gripper = gripper_val;
     newNode->next = NULL;
-    
-    MyLinkedList *last_node = myLinkedListCreate(); 
 
-    //void *last_node = NULL;
+    MyLinkedList *last_node = NULL;
 
     while(obj != NULL){
         last_node = obj;
         obj = obj->next;
     }
-    
+
     obj = last_node;
     obj->next = newNode;
-    free(last_node);
+
+    // free(last_node);
 }
 
 void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int x_val, int y_val, int z_val, int gripper_val) {
@@ -119,14 +119,13 @@ void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int x_val, int y_val, 
     }
 
     if(index == 1 && obj->val == 1001) return;
-    MyLinkedList *newNode = (MyLinkedList*)malloc(sizeof(MyLinkedList));
+    MyLinkedList *newNode = myLinkedListCreate();
     newNode->x = x_val;
     newNode->y = y_val;
     newNode->z = z_val;
     newNode->gripper = gripper_val;
 
-    MyLinkedList *last_node = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
-    //void *last_node = NULL;
+    MyLinkedList *last_node = NULL;
     int count = 0;
     
     while(obj != NULL){
@@ -139,7 +138,6 @@ void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int x_val, int y_val, 
             newNode->next = obj;
             obj = last_node;
             obj->next = newNode;
-            free(last_node);
             return;
         }
     }
@@ -148,10 +146,8 @@ void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int x_val, int y_val, 
 void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
     // There is no list
     if(obj == NULL) return;
-    MyLinkedList *last_node = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
-    MyLinkedList *kill_node = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
-
-    // void *last_node = NULL, *kill_node = NULL;
+    
+    MyLinkedList *last_node = NULL, *kill_node = NULL;
     int count = 0;
     
     // The head cannot be deleted because leetcode keeps the head address in a struct that is not
@@ -166,8 +162,6 @@ void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
         else{
             obj->val = 1001;
         }
-        free(kill_node);
-        free(last_node);
         return;
     }
     
@@ -189,9 +183,7 @@ void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
 void myLinkedListFree(MyLinkedList* obj) {
     if(obj == NULL) return;
 
-    //void *kill_node = NULL;
-    MyLinkedList *kill_node = (MyLinkedList*)malloc(sizeof(MyLinkedList)); 
-
+    void *kill_node = NULL;
     while(obj != NULL){
         kill_node = obj;
         obj = obj->next;
@@ -203,9 +195,9 @@ void myLinkedListPrint(MyLinkedList *obj){
     int index = 0;
     while(obj != NULL){
         printf("Waypoint #%i \n", index);
-        printf("%i \n", obj->x);
-        printf("%i \n", obj->y);
-        printf("%i \n", obj->z);
+        printf("%f \n", obj->x);
+        printf("%f \n", obj->y);
+        printf("%f \n", obj->z);
         printf("%i \n \n", obj->gripper);
         index++;
         obj = obj->next;
