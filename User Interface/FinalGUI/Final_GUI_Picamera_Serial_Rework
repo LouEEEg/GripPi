@@ -30,11 +30,18 @@ photo2 = PhotoImage(file = "bin2.png")
 photo3 = PhotoImage(file = "bin3.png")
 empty_bin_image = PhotoImage(file = "EmptyBin_small.png")
 
+bin1_image = PhotoImage(file = config.get('image', 'bin1_image'))
+bin2_image = PhotoImage(file = config.get('image', 'bin2_image'))
+bin3_image = PhotoImage(file = config.get('image', 'bin3_image'))
+
 class gripPiBin:
-    def __init__(self, isEmpty, image, states_pick):
+    def __init__(self, isEmpty, image):
         self.isEmpty = isEmpty
         self.image = image
-        self.states_pick = states_pick
+        
+bin1 = gripPiBin(config.getboolean('main', 'bin1_isEmpty'), bin1_image)
+bin2 = gripPiBin(config.getboolean('main', 'bin2_isEmpty'), bin2_image)
+bin3 = gripPiBin(config.getboolean('main', 'bin3_isEmpty'), bin3_image)
 
 class widgets:
     def __init__(self, Button):
@@ -55,43 +62,26 @@ def GripPiSerial(GripPiTx):
                 #GripPiRx = ser.read_until().decode('utf-8').rstrip()
     return GripPiRx
 
-bin1_image = PhotoImage(file = config.get('image', 'bin1_image'))
-bin2_image = PhotoImage(file = config.get('image', 'bin2_image'))
-bin3_image = PhotoImage(file = config.get('image', 'bin3_image'))
 
-# New Locations for sequence
-#home_open = "<800,800,0,90>"
 
-#safe_open = "<300,300,350,90>"
-#calibrate_from_startup = "<999,300,350,90>"
-#calibrate_from_home = "<998,300,350,90>"
+CalibrateStartup = "<999,300,350,90>"
+CalibrateHome = "<998,300,350,90>"
+#RestHome = "<800,800,0,90>"
+RestPosition = "<200,45,360,90>"
 
-#bin1_pos_open = "<485,210,315,90>"
-#bin2_pos_open = "<485,210,148,90>"
-#bin3_pos_open = "<485,210,0,90>"
-#bin1_pos_closed = "<485,210,315,130>"
-#bin2_pos_closed = "<485,210,148,130>"
-#bin3_pos_closed = "<485,210,0,130>"
+BinOpen1="<485,210,315,90>"
+BinOpen2="<485,210,148,90>"
+BinOpen3="<485,210,0,90>"
 
-#camera_pos_lineup = "<200,70,300,130>"
-#camera_pos_final = "<300,70,300,130>"
+BinToUser="<1,70,345,130>"
+UserOpen="<1,70,345,90>"
 
-#user_pos_grip_open = "<1,70,345,90>"
-#user_pos_grip_closed = "<1,70,345,130>"
+UserToCamera="<300,70,300,130>"
+CameraToBin1="<485,210,315,130>"
+CameraToBin2="<485,210,148,130>"
+CameraToBin3="<485,210,0,130>"
 
-BinOpen1="<420,300,200,90>"
-BinOpen2="<354,300,108,90>"
-BinOpen3="<370,300,0,90>"
-BinToUser1="<485,300,315,130>"
-BinToUser2="<485,300,148,130>"
-BinToUser3="<485,300,0,130>"
-UserToCamera="<1,95,350,130>"
-CameraToBin1="<200,95,300,130>"
-CameraToBin2="<200,95,300,130>"
-CameraToBin3="<200,95,300,130>"
-BinToNeutral1="<485,300,320,90>"
-BinToNeutral2="<485,300,148,90>"
-BinToNeutral3="<485,300,0,90>"
+ReturnToIdle="<127,300,348,90>"
 
 gripPi_calibration = False
 
@@ -100,7 +90,7 @@ Bin_in = True
 
 def calibrate():
     messagebox.showwarning("WARNING", "Clear workspace before Calibrating")
-    homeSet = GripPiSerial(calibrate_from_startup)
+    homeSet = GripPiSerial(CalibrateStartup)
     global gripPi_calibration
     gripPi_calibration = True 
 
@@ -108,7 +98,8 @@ def close_gui():
     if(not(gripPi_calibration)):
         sys.exit()
     else:  
-        homeSet = GripPiSerial(calibrate_from_home)
+        #homeSet = GripPiSerial(RestHome)
+        homeSet = GripPiSerial(RestPosition)
         sys.exit()
 
 def forget(widget):
@@ -176,7 +167,7 @@ def screenHome():
                 if bin1.isEmpty :
                     #STORAGE FROM USER TO SHELF
                     homeSet = GripPiSerial(UserToCamera)
-                    time.sleep(9)
+                    time.sleep(10)
                     picam2.capture_file("bin1.png")
                     photo1 = PhotoImage(file = "bin1.png")
                     itemButtonLeft.configure(image=photo1)
@@ -184,8 +175,7 @@ def screenHome():
                     config.set('main', 'bin1_isEmpty', 'False')
                     config.set('image', 'bin1_image', 'bin1.png')
                     homeSet = GripPiSerial(CameraToBin1)
-                    time.sleep(1)
-                    homeSet = GripPiSerial(BinToNeutral1)
+                    homeSet = GripPiSerial(ReturnToIdle)
                     global Bin_in
                     Bin_in = True
                     bin1.isEmpty = False
@@ -202,8 +192,8 @@ def screenHome():
                     Bin_in = False
                     bin1.isEmpty = True
                     homeSet = GripPiSerial(BinOpen1)
-                    time.sleep(1)
-                    homeSet = GripPiSerial(BinToUser1)#missing gripper opening
+                    homeSet = GripPiSerial(BinToUser)
+                    homeSet = GripPiSerial(UserOpen)
                 
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
                     config.write(f)                                          
@@ -213,17 +203,16 @@ def screenHome():
                 itemButtonLeft.pack_forget()
                 itemButtonRight.pack_forget()
                 if bin2.isEmpty :
-                    homeSet = GripPiSerial(camera_pos_final)
-                    time.sleep(9)
+                    homeSet = GripPiSerial(UserToCamera)
+                    time.sleep(10)
                     picam2.capture_file("bin2.png")
                     photo2 = PhotoImage(file = "bin2.png")
                     itemButtonCenter.configure(image=photo2)
                     bin2.image = photo2
                     config.set('main', 'bin2_isEmpty', 'False')
                     config.set('image', 'bin2_image', 'bin2.png')
-                    homeSet = GripPiSerial(bin2_pos_closed)
-                    time.sleep(1)
-                    homeSet = GripPiSerial(safe_open)
+                    homeSet = GripPiSerial(CameraToBin2)
+                    homeSet = GripPiSerial(ReturnToIdle)
                     global Bin_in
                     Bin_in = True
                     bin2.isEmpty = False
@@ -238,11 +227,9 @@ def screenHome():
                     config.set('image', 'bin2_image', 'EmptyBin_small.png')
                     Bin_in = False
                     bin2.isEmpty = True
-                    homeSet = GripPiSerial(bin2_pos_open)
-                    time.sleep(1)
-                    homeSet = GripPiSerial(user_pos_grip_closed)
-                    time.sleep(1)
-                    homeSet = GripPiSerial(user_pos_grip_open)
+                    homeSet = GripPiSerial(BinOpen2)
+                    homeSet = GripPiSerial(BinToUser)
+                    homeSet = GripPiSerial(UserOpen)
                     
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
                     config.write(f)
@@ -252,17 +239,16 @@ def screenHome():
                 itemButtonLeft.pack_forget()
                 itemButtonCenter.pack_forget()
                 if bin3.isEmpty :
-                    homeSet = GripPiSerial(camera_pos_final)
-                    time.sleep(9)
+                    homeSet = GripPiSerial(UserToCamera)
+                    time.sleep(10)
                     picam2.capture_file("bin3.png")
                     photo3 = PhotoImage(file = "bin3.png")
                     itemButtonRight.configure(image=photo3)
                     bin3.image = photo3
                     config.set('main', 'bin3_isEmpty', 'False')
                     config.set('image', 'bin3_image', 'bin3.png')
-                    homeSet = GripPiSerial(bin3_pos_closed)
-                    time.sleep(1)
-                    homeSet = GripPiSerial(safe_open)
+                    homeSet = GripPiSerial(CameraToBin3)
+                    homeSet = GripPiSerial(ReturnToIdle)
                     global Bin_in
                     Bin_in = True
                     bin3.isEmpty = False
@@ -277,11 +263,9 @@ def screenHome():
                     config.set('image', 'bin3_image', 'EmptyBin_small.png')
                     Bin_in = False
                     bin3.isEmpty = True
-                    homeSet = GripPiSerial(bin3_pos_open)
-                    time.sleep(1)
-                    homeSet = GripPiSerial(user_pos_grip_closed)
-                    time.sleep(1)
-                    homeSet = GripPiSerial(user_pos_grip_open)
+                    homeSet = GripPiSerial(BinOpen3)
+                    homeSet = GripPiSerial(BinToUser)
+                    homeSet = GripPiSerial(UserOpen)
                     
                 with open('config.ini', 'w', encoding = "UTF-8") as f:
                     config.write(f)
